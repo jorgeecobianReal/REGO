@@ -32,7 +32,7 @@
   "name": "Rego dos Campos",
   "description": "Finca de aguacates en Galicia.",
   "address": { "@type": "PostalAddress", "addressRegion": "Galicia", "addressCountry": "ES" },
-  "sameAs": ["https://www.tiktok.com/@regodoscampos2"]
+  "sameAs": ["https://www.tiktok.com/@regodoscampos2", "https://www.instagram.com/regodoscampos/"]
 }
 </script>
 </head>
@@ -41,6 +41,11 @@
 
 <svg class="svg-defs" aria-hidden="true" focusable="false">
   <defs>
+    <radialGradient id="g-shade" cx=".42" cy=".38" r=".62">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".14"/>
+      <stop offset=".55" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity=".6"/>
+    </radialGradient>
     <radialGradient id="g-sheen" cx=".5" cy=".5" r=".5">
       <stop offset="0" stop-color="#FFFFFF" stop-opacity=".32"/>
       <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
@@ -129,8 +134,8 @@
     <div class="scene__sticky">
       <canvas class="scene__canvas" data-avocado-scene aria-hidden="true"></canvas>
       <div class="scene__fallback" aria-hidden="true">
-        <img class="scene__fallback-img scene__fallback-img--closed" src="assets/img/avocado-closed.png" alt="" decoding="async">
-        <img class="scene__fallback-img scene__fallback-img--open" src="assets/img/avocado-open.png" alt="" decoding="async">
+        <img class="scene__fallback-img scene__fallback-img--closed" data-src="assets/img/avocado-closed.webp" alt="" decoding="async">
+        <img class="scene__fallback-img scene__fallback-img--open" data-src="assets/img/avocado-open.webp" alt="" decoding="async">
       </div>
       <div class="scene__scrim" aria-hidden="true"></div>
 
@@ -179,7 +184,8 @@
         <p class="eyebrow">Ábrelo</p>
         <h2 class="h2">Por dentro, todo es tiempo.</h2>
       </div>
-      <img class="open-static__img" src="assets/img/avocado-open.png" alt="Aguacate abierto por la mitad: pulpa amarilla y verde con el hueso" decoding="async" loading="lazy">
+      <img class="open-static__img" data-src="assets/img/avocado-open.webp" alt="Aguacate abierto por la mitad: pulpa amarilla y verde con el hueso" decoding="async" loading="lazy">
+      <noscript><img class="open-static__img" src="assets/img/avocado-open.webp" alt="Aguacate abierto por la mitad: pulpa amarilla y verde con el hueso"></noscript>
       <ul class="anatomy anatomy--static">
         <li class="anatomy__item"><span class="anatomy__label">Piel</span><p>En el Hass se vuelve casi negra al madurar. En el Bacon se queda verde y fina.</p></li>
         <li class="anatomy__item"><span class="anatomy__label">Pulpa</span><p>Cremosa, con notas de mantequilla y fruto seco. El árbol tarda más de un año en formarla.</p></li>
@@ -299,6 +305,7 @@
         <p class="eyebrow">Temporada</p>
         <h2 class="h2" data-split>Aguacate <em>de invierno.</em></h2>
         <p class="lead" data-reveal>En Galicia la cosecha se concentra en los meses fríos y, según la variedad, se alarga hasta la primavera. El calendario es orientativo: cada año manda el árbol.</p>
+        <p class="season" data-season data-reveal></p>
       </div>
       <div class="cal-scroll" data-reveal>
         <table class="cal">
@@ -341,6 +348,7 @@
             <svg class="ripe__avo" viewBox="0 0 200 280">
               <use href="#s-avo" class="ripe__skin"/>
               <use href="#s-avo" fill="#000" opacity=".2" filter="url(#f-pebble)"/>
+              <use href="#s-avo" fill="url(#g-shade)"/>
               <ellipse cx="72" cy="118" rx="18" ry="48" transform="rotate(22 72 118)" fill="url(#g-sheen)"/>
             </svg>
           </div>
@@ -396,16 +404,19 @@
 
       <div class="covers" data-reveal-group>
         <a class="cover cover--a" data-social="tiktok" href="https://www.tiktok.com/@regodoscampos2" target="_blank" rel="noopener" data-cursor="Ver">
+          <span class="cover__rain" aria-hidden="true"></span>
           <span class="cover__mark"><svg aria-hidden="true"><use href="#s-mark"/></svg></span>
           <span class="cover__word">Recollido<br><i>a man</i></span>
           <span class="cover__meta mono">Cosecha</span>
         </a>
         <a class="cover cover--b" data-social="tiktok" href="https://www.tiktok.com/@regodoscampos2" target="_blank" rel="noopener" data-cursor="Ver">
+          <span class="cover__rain" aria-hidden="true"></span>
           <span class="cover__mark"><svg aria-hidden="true"><use href="#s-mark"/></svg></span>
           <span class="cover__word">Con choiva<br><i>e paciencia</i></span>
           <span class="cover__meta mono">Entre árboles</span>
         </a>
         <a class="cover cover--c" data-social="tiktok" href="https://www.tiktok.com/@regodoscampos2" target="_blank" rel="noopener" data-cursor="Ver">
+          <span class="cover__rain" aria-hidden="true"></span>
           <span class="cover__mark"><svg aria-hidden="true"><use href="#s-mark"/></svg></span>
           <span class="cover__word">Da finca<br><i>á túa mesa</i></span>
           <span class="cover__meta mono">Pedidos</span>
@@ -495,6 +506,8 @@
   </section>
 
 </main>
+
+<a class="sticky-cta" href="#pedidos" aria-hidden="true" tabindex="-1"><span>Pedir aguacates</span><svg class="icon" aria-hidden="true"><use href="#s-arrow"/></svg></a>
 
 <footer class="footer" data-tone="night">
   <div class="wrap">

@@ -318,15 +318,17 @@ export function createAvocadoScene(canvas) {
 
   /* Materiales */
   const skin = skinTextures();
-  const skinMat = new THREE.MeshStandardMaterial({
+  const skinMat = new THREE.MeshPhysicalMaterial({
     map: skin.map, bumpMap: skin.bump, bumpScale: 0.9, roughnessMap: skin.rough,
-    roughness: 1, metalness: 0, envMapIntensity: 0.9
+    roughness: 1, metalness: 0, envMapIntensity: 0.9,
+    clearcoat: 0.22, clearcoatRoughness: 0.5
   });
   const points = profilePoints();
   const cap = capGeometry(points);
   const pit = { x: 0, y: -0.34, r: 0.3 };
-  const fleshA = new THREE.MeshStandardMaterial({ map: fleshTexture(cap.outline, cap.box, pit, true), roughness: 0.45, metalness: 0, envMapIntensity: 0.6, emissive: 0x2a2e10, emissiveIntensity: 0.45 });
-  const fleshB = new THREE.MeshStandardMaterial({ map: fleshTexture(cap.outline, cap.box, pit, false), roughness: 0.45, metalness: 0, envMapIntensity: 0.6, emissive: 0x2a2e10, emissiveIntensity: 0.45 });
+  const fleshOpts = { roughness: 0.42, metalness: 0, envMapIntensity: 0.6, emissive: 0x2a2e10, emissiveIntensity: 0.45, clearcoat: 0.35, clearcoatRoughness: 0.35 };
+  const fleshA = new THREE.MeshPhysicalMaterial(Object.assign({ map: fleshTexture(cap.outline, cap.box, pit, true) }, fleshOpts));
+  const fleshB = new THREE.MeshPhysicalMaterial(Object.assign({ map: fleshTexture(cap.outline, cap.box, pit, false) }, fleshOpts));
   const pitTex = pitTextures();
   const pitMat = new THREE.MeshStandardMaterial({ map: pitTex.map, bumpMap: pitTex.bump, bumpScale: 0.5, roughness: 0.48, metalness: 0, envMapIntensity: 0.8 });
 
@@ -473,6 +475,10 @@ export function createAvocadoScene(canvas) {
     const pop = 0.82 + 0.18 * smoothstep(0.55, 0.85, open);
     pitMesh.scale.set(0.96 * pop, 1.08 * pop, 0.96 * pop);
 
+    // Luz que respira: nubes pasando
+    key.intensity = 2.6 + Math.sin(state.t * 0.45) * 0.35;
+    rim.position.x = -3.5 + Math.sin(state.t * 0.3) * 0.8;
+
     // Movimiento: giro lento y flotación en el hero, quietud al abrir
     state.px = lerp(state.px, state.tx, Math.min(1, dt * 4));
     state.py = lerp(state.py, state.ty, Math.min(1, dt * 4));
@@ -549,6 +555,7 @@ export function createAvocadoScene(canvas) {
   const api = createAvocadoScene(canvas);
   if (!api) {
     document.documentElement.classList.add('no-webgl');
+    window.dispatchEvent(new CustomEvent('rego:scene-failed'));
     return;
   }
   window.REGO_SCENE = api;
