@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="es" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rego dos Campos · Aguacates de Galicia</title>
+<meta name="description" content="Rego dos Campos es una finca de aguacates en Galicia. Aguacates cultivados al ritmo del clima atlántico, recogidos a mano y de la finca a tu mesa.">
+<meta name="theme-color" content="#E4E9E1">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:site_name" content="Rego dos Campos">
+<meta property="og:title" content="Rego dos Campos · Aguacates de Galicia">
+<meta property="og:description" content="Aguacates cultivados con la lluvia de Galicia. De la finca a tu mesa.">
+<meta property="og:image" content="assets/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Hanken+Grotesk:wght@300..700&family=Spline+Sans+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/css/styles.css">
+<script>
+  (function (d) {
+    d.classList.remove('no-js'); d.classList.add('js');
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('reduced-motion');
+    setTimeout(function () { d.classList.add('loaded'); }, 4500);
+  })(document.documentElement);
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Rego dos Campos",
+  "description": "Finca de aguacates en Galicia.",
+  "address": { "@type": "PostalAddress", "addressRegion": "Galicia", "addressCountry": "ES" },
+  "sameAs": ["https://www.tiktok.com/@regodoscampos2"]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+
+<!-- Recursos SVG compartidos: degradados, textura de piel y siluetas -->
+<svg class="svg-defs" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="g-skin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4C6E33"/>
+      <stop offset=".45" stop-color="#27391A"/>
+      <stop offset="1" stop-color="#10170B"/>
+    </linearGradient>
+    <radialGradient id="g-sheen" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g-flesh" cx=".5" cy=".64" r=".62">
+      <stop offset="0" stop-color="#F6EFAE"/>
+      <stop offset=".42" stop-color="#E9E58E"/>
+      <stop offset=".74" stop-color="#C3D466"/>
+      <stop offset=".92" stop-color="#8DB04A"/>
+      <stop offset="1" stop-color="#4D7A2E"/>
+    </radialGradient>
+    <radialGradient id="g-pit" cx=".36" cy=".3" r=".78">
+      <stop offset="0" stop-color="#B57A49"/>
+      <stop offset=".55" stop-color="#7A4A2A"/>
+      <stop offset="1" stop-color="#46270F"/>
+    </radialGradient>
+    <radialGradient id="g-cavity" cx=".5" cy=".42" r=".62">
+      <stop offset="0" stop-color="#DCD47C"/>
+      <stop offset=".7" stop-color="#BDC560"/>
+      <stop offset="1" stop-color="#8FA647"/>
+    </radialGradient>
+    <linearGradient id="g-leaf" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#2E4A22"/>
+      <stop offset="1" stop-color="#6C9A40"/>
+    </linearGradient>
+    <filter id="f-pebble" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7" result="noise"/>
+      <feDiffuseLighting in="noise" lighting-color="#ffffff" surfaceScale="1.4" result="light">
+        <feDistantLight azimuth="225" elevation="58"/>
+      </feDiffuseLighting>
+      <feComposite in="light" in2="SourceGraphic" operator="in" result="lit"/>
+      <feBlend in="SourceGraphic" in2="lit" mode="multiply"/>
+    </filter>
+    <symbol id="s-avo" viewBox="0 0 200 280">
+      <path d="M100 10C126 10 139 38 145 74C151 109 186 136 186 190C186 241 149 272 100 272C51 272 14 241 14 190C14 136 49 109 55 74C61 38 74 10 100 10Z"/>
+    </symbol>
+    <symbol id="s-mark" viewBox="0 0 200 280">
+      <path d="M100 10C126 10 139 38 145 74C151 109 186 136 186 190C186 241 149 272 100 272C51 272 14 241 14 190C14 136 49 109 55 74C61 38 74 10 100 10Z" fill="none" stroke="currentColor" stroke-width="16"/>
+      <circle cx="100" cy="186" r="38" fill="currentColor"/>
+    </symbol>
+    <symbol id="s-arrow" viewBox="0 0 24 24">
+      <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="s-out" viewBox="0 0 24 24">
+      <path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="loader" aria-hidden="true">
+  <div class="loader__inner">
+    <svg class="loader__mark" viewBox="0 0 200 280">
+      <path class="loader__path" d="M100 10C126 10 139 38 145 74C151 109 186 136 186 190C186 241 149 272 100 272C51 272 14 241 14 190C14 136 49 109 55 74C61 38 74 10 100 10Z"/>
+      <circle class="loader__pit" cx="100" cy="186" r="38"/>
+    </svg>
+    <p class="loader__word"><span>Rego dos Campos</span></p>
+  </div>
+  <p class="loader__foot"><span>Aguacates de Galicia</span><span class="loader__count">0</span></p>
+</div>
+
+<div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
+<div class="progress" aria-hidden="true"><span></span></div>
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="brand" href="#top" aria-label="Rego dos Campos, ir al inicio">
+      <svg class="brand__mark" aria-hidden="true"><use href="#s-mark"/></svg>
+      <span class="brand__name">Rego dos Campos</span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <ul>
+        <li><a href="#finca">La finca</a></li>
+        <li><a href="#proceso">Proceso</a></li>
+        <li><a href="#temporada">Temporada</a></li>
+        <li><a href="#guia">Guía</a></li>
+        <li><a href="#tiktok">TikTok</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn--small site-header__cta" href="#pedidos" data-magnetic><span>Pedir aguacates</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">
+      <span class="menu-toggle__bars" aria-hidden="true"><i></i><i></i></span>
+      <span class="sr-only">Abrir menú</span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu tone-skin" id="mobile-menu" hidden>
+  <nav aria-label="Menú móvil">
+    <ul>
+      <li><a href="#finca">La finca</a></li>
+      <li><a href="#proceso">Proceso</a></li>
+      <li><a href="#temporada">Temporada</a></li>
+      <li><a href="#guia">Guía</a></li>
+      <li><a href="#pedidos">Pedidos</a></li>
+    </ul>
+  </nav>
+  <div class="mobile-menu__foot">
+    <a data-social="tiktok" href="https://www.tiktok.com/@regodoscampos2" target="_blank" rel="noopener">TikTok</a>
+    <a data-social="instagram" href="https://www.instagram.com/regodoscampos/" target="_blank" rel="noopener">Instagram</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="top" data-tone="mist">
+    <canvas class="hero__rain" aria-hidden="true"></canvas>
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow hero__eyebrow">Finca de aguacates · Galicia</p>
+        <h1 class="hero__title">Aguacates criados con la lluvia de&nbsp;Galicia.</h1>
+        <p class="hero__lead">En Rego dos Campos cultivamos aguacates al ritmo del clima atlántico. Árboles cuidados a mano, fruta recogida en su momento y de la finca directa a tu mesa.</p>
+        <div class="hero__actions">
+          <a class="btn" href="#pedidos" data-magnetic><span>Pedir aguacates</span><svg class="icon" aria-hidden="true"><use href="#s-arrow"/></svg></a>
+          <a class="btn btn--ghost" data-social="tiktok" href="https://www.tiktok.com/@regodoscampos2" target="_blank" rel="noopener" data-cursor="Ver"><span>La finca en TikTok</span><svg class="icon" aria-hidden="true"><use href="#s-out"/></svg></a>
+        </div>
+      </div>
+
+      <div class="hero__visual" aria-hidden="true">
+        <div class="hero__halo"></div>
+        <div class="hero__float">
+          <svg class="hero__avo" viewBox="0 0 260 350">
+            <g class="hero__leaf">
+              <path d="M131 76C130 62 132 52 138 42" fill="none" stroke="#5A3A22" stroke-width="6" stroke-linecap="round"/>
+              <path d="M138 44C153 20 197 10 238 20C218 50 176 64 138 44Z" fill="url(#g-leaf)"/>
+              <path d="M138 44C171 36 201 28 238 20" fill="none" stroke="#ffffff" stroke-opacity=".28" stroke-width="1.5"/>
+            </g>
+            <g transform="translate(30 66)">
+              <use href="#s-avo" width="200" height="280" fill="url(#g-skin)" filter="url(#f-pebble)"/>
+              <ellipse cx="78" cy="132" rx="20" ry="52" transform="rotate(22 78 132)" fill="url(#g-sheen)"/>
+            </g>
+          </svg>
+        </div>
+        <div class="hero__shadow"></div>
+        <span class="tag tag--a">Clima atlántico</span>
+        <span class="tag tag--b">Recollido a man</span>
+      </div>
+    </div>
+    <div class="wrap hero__foot">
+      <span class="scroll-cue"><i></i>Desliza</span>
+      <span class="mono">Feito en Galicia</span>
+    </div>
+  </section>
+
+  <!-- ============ MARQUEE ============ -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__row">
+      <div class="marquee__track">
+        <span>Aguacate de Galicia</span><svg><use href="#s-mark"/></svg>
+        <span>Recollido a man</span><svg><use href="#s-mark"/></svg>
+        <span>Da finca á túa mesa</span><svg><use href="#s-mark"/></svg>
+        <span>Con choiva e paciencia</span><svg><use href="#s-mark"/></svg>
+        <span>Aguacate de Galicia</span><svg><use href="#s-mark"/></svg>
+        <span>Recollido a man</span><svg><use href="#s-mark"/></svg>
+        <span>Da finca á túa mesa</span><svg><use href="#s-mark"/></svg>
+        <span>Con choiva e paciencia</span><svg><use href="#s-mark"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ÁBRELO (aguacate que se abre) ============ -->
+  <section class="open" id="dentro" data-tone="skin">
+    <div class="open__pin">
+      <div class="wrap open__head">
+        <p class="eyebrow">Ábrelo</p>
+        <h2 class="h2" data-split>Por dentro, todo es tiempo.</h2>
+      </div>
+      <div class="wrap open__stage">
+        <ul class="anatomy anatomy--left">
+          <li class="anatomy__item">
+            <span class="anatomy__label">Piel</span>
+            <p>En el Hass se vuelve casi negra al madurar. En el Bacon se queda verde y fina.</p>
+          </li>
+        </ul>
+        <div class="avo3d-wrap" aria-hidden="true">
+          <div class="avo3d">
+            <div class="avo-half avo-half--l">
+              <div class="face face--skin">
+                <svg viewBox="0 0 200 280"><use href="#s-avo" fill="url(#g-skin)" filter="url(#f-pebble)"/><ellipse cx="72" cy="118" rx="18" ry="48" transform="rotate(22 72 118)" fill="url(#g-sheen)"/></svg>
+              </div>
+              <div class="face face--flesh">
+                <svg viewBox="0 0 200 280">
+                  <use href="#s-avo" fill="#1C2913"/>
+                  <path d="M100 22C122 22 132 46 137 78C142 110 173 138 173 189C173 233 141 259 100 259C59 259 27 233 27 189C27 138 58 110 63 78C68 46 78 22 100 22Z" fill="url(#g-flesh)"/>
+                  <g class="avo-pit">
+                    <ellipse cx="100" cy="184" rx="41" ry="45" fill="url(#g-pit)"/>
+                    <ellipse cx="86" cy="166" rx="12" ry="8" fill="#ffffff" opacity=".22"/>
+                  </g>
+                </svg>
+              </div>
+            </div>
+            <div class="avo-half avo-half--r">
+              <div class="face face--skin">
+                <svg viewBox="0 0 200 280"><use href="#s-avo" fill="url(#g-skin)" filter="url(#f-pebble)"/><ellipse cx="72" cy="118" rx="18" ry="48" transform="rotate(22 72 118)" fill="url(#g-sheen)"/></svg>
+              </div>
+              <div class="face face--flesh">
+                <svg viewBox="0 0 200 280">
+                  <use href="#s-avo" fill="#1C2913"/>
+                  <path d="M100 22C122 22 132 46 137 78C142 110 173 138 173 189C173 233 141 259 100 259C59 259 27 233 27 189C27 138 58 110 63 78C68 46 78 22 100 22Z" fill="url(#g-flesh)"/>
+                  <ellipse cx="100" cy="184" rx="41" ry="45" fill="url(#g-cavity)"/>
+                  <ellipse cx="100" cy="184" rx="39" ry="43" fill="none" stroke="#6F8A33" stroke-opacity=".35" stroke-width="4"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="anatomy anatomy--right">
+          <li class="anatomy__item">
+            <span class="anatomy__label">Pulpa</span>
+            <p>Cremosa, con notas de mantequilla y fruto seco. El árbol puede tardar más de un año en formarla.</p>
+          </li>
+          <li class="anatomy__item">
+            <span class="anatomy__label">Hueso</span>
+            <p>No lo tires. Sujeto con palillos sobre un vaso de agua, con paciencia acaba germinando.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EL NOMBRE ============ -->
+  <section class="manifesto" data-tone="mist">
+    <div class="wrap manifesto__grid">
+      <p class="eyebrow">O nome</p>
+      <p class="manifesto__text"><em>Rego</em>, en gallego, es el pequeño cauce por el que corre el agua entre los campos. De ahí viene nuestro nombre y también nuestra manera de trabajar: dejar que la lluvia, la tierra y el tiempo hagan su parte, y cuidar el resto a mano.</p>
+      <aside class="dict" aria-label="Definición de rego en gallego" data-reveal>
+        <p class="dict__word">rego <span>s. m.</span></p>
+        <ol>
+          <li>Pequeno curso de auga.</li>
+          <li>Suco que se abre na terra para levar a auga de rega.</li>
+        </ol>
+        <p class="dict__lang">Galego</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ LA FINCA ============ -->
+  <section class="finca" id="finca" data-tone="leaf">
+    <canvas class="finca__land" aria-hidden="true"></canvas>
+    <div class="wrap finca__inner">
+      <div class="finca__head">
+        <p class="eyebrow">La finca</p>
+        <h2 class="h2" data-split>Una finca a la medida del clima atlántico.</h2>
+        <p class="lead" data-reveal>Galicia no es el primer lugar en el que uno piensa al hablar de aguacates. Inviernos suaves junto al mar, lluvia generosa y suelos que drenan bien hacen que aquí crezcan sin prisa y con mucho sabor.</p>
+      </div>
+      <dl class="facts" data-reveal-group>
+        <div class="fact">
+          <dt><span class="mono">Clima</span></dt>
+          <dd>El aguacate no lleva bien las heladas. La influencia del Atlántico suaviza los inviernos de la costa gallega.</dd>
+        </div>
+        <div class="fact">
+          <dt><span class="mono">Agua</span></dt>
+          <dd>La lluvia hace casi todo el trabajo. En verano, el árbol solo recibe el riego que necesita.</dd>
+        </div>
+        <div class="fact">
+          <dt><span class="mono">Manos</span></dt>
+          <dd>Poda, desbroce y cosecha se hacen a mano, árbol por árbol.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ============ PROCESO ============ -->
+  <section class="proceso" id="proceso" data-tone="flesh">
+    <div class="proceso__pin">
+      <div class="wrap proceso__head">
+        <p class="eyebrow">Del árbol a tu mesa</p>
+        <h2 class="h2" data-split>Cinco pasos y ningún atajo.</h2>
+      </div>
+      <ol class="proceso__track">
+        <li class="step">
+          <span class="step__n">01<small>/05</small></span>
+          <svg class="step__icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 54h48"/><path d="M32 54V30"/><path d="M32 34c0-11-8-18-20-18 0 12 8 18 20 18z"/><path d="M32 30c0-9 7-15 18-15 0 10-7 15-18 15z"/></svg>
+          <h3>Plantar</h3>
+          <p>Cada árbol empieza como un plantón injertado. El sitio importa: sol, abrigo del viento y una tierra que no encharque.</p>
+        </li>
+        <li class="step">
+          <span class="step__n">02<small>/05</small></span>
+          <svg class="step__icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M18 36a10 10 0 0 1 1-20 14 14 0 0 1 26 3 9 9 0 0 1 1 17z"/><path d="M22 44l-3 7"/><path d="M32 44l-3 7"/><path d="M42 44l-3 7"/></svg>
+          <h3>Crecer</h3>
+          <p>Lluvia atlántica, poda ligera y paciencia. Un aguacate tarda varios años en dar su primera cosecha de verdad.</p>
+        </li>
+        <li class="step">
+          <span class="step__n">03<small>/05</small></span>
+          <svg class="step__icon" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="24" r="15"/><path d="M32 39v15"/><path d="M22 54h20"/><path d="M32 46l-6-5"/><path d="M41 28c2.5 0 4 2.5 4 5s-1.5 5-4 5-4-2.5-4-5 1.5-5 4-5z"/></svg>
+          <h3>Esperar</h3>
+          <p>De la flor al fruto pueden pasar más de doce meses. En el árbol el aguacate no se ablanda: allí solo gana aceite y sabor.</p>
+        </li>
+        <li class="step">
+          <span class="step__n">04<small>/05</small></span>
+          <svg class="step__icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M10 30h44l-5 22H15z"/><path d="M20 30l8-14"/><path d="M44 30l-8-14"/><path d="M18 38h28"/><path d="M16 45h32"/></svg>
+          <h3>Cosechar</h3>
+          <p>A mano y lo más cerca posible de tu pedido. El árbol es la mejor despensa: el fruto aguanta colgado sin estropearse.</p>
+        </li>
+        <li class="step">
+          <span class="step__n">05<small>/05</small></span>
+          <svg class="step__icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 8c6 0 9 6 10 13 1 7 9 12 9 23 0 10-8 14-19 14S13 54 13 44c0-11 8-16 9-23 1-7 4-13 10-13z"/><circle cx="32" cy="42" r="7"/></svg>
+          <h3>Tu mesa</h3>
+          <p>Te llega firme y termina de madurar en tu cocina en unos días. Así no viaja blando ni se golpea por el camino.</p>
+        </li>
+      </ol>
+      <div class="wrap proceso__bar" aria-hidden="true"><span></span></div>
+    </div>
+  </section>
+
+  <!-- ============ TEMPORADA ============ -->
+  <section class="temporada" id="temporada" data-tone="mist">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Temporada</p>
+        <h2 class="h2" data-split>Aguacate de invierno.</h2>
+        <p class="lead" data-reveal>En Galicia la cosecha se concentra en los meses fríos y, según la variedad, se alarga hasta la primavera. El calendario es orientativo: cada año manda el árbol.</p>
+      </div>
+      <div class="cal-scroll" data-reveal>
+        <table class="cal">
+          <caption class="sr-only">Calendario orientativo de cosecha por variedad</caption>
+          <thead>
+            <tr>
+              <th scope="col"><span class="sr-only">Variedad</span></th>
+              <th scope="col" data-m="1"><span class="m-l">Ene</span><span class="m-s" aria-hidden="true">E</span></th>
+              <th scope="col" data-m="2"><span class="m-l">Feb</span><span class="m-s" aria-hidden="true">F</span></th>
+              <th scope="col" data-m="3"><span class="m-l">Mar</span><span class="m-s" aria-hidden="true">M</span></th>
+              <th scope="col" data-m="4"><span class="m-l">Abr</span><span class="m-s" aria-hidden="true">A</span></th>
+              <th scope="col" data-m="5"><span class="m-l">May</span><span class="m-s" aria-hidden="true">M</span></th>
+              <th scope="col" data-m="6"><span class="m-l">Jun</span><span class="m-s" aria-hidden="true">J</span></th>
+              <th scope="col" data-m="7"><span class="m-l">Jul</span><span class="m-s" aria-hidden="true">J</span></th>
+              <th scope="col" data-m="8"><span class="m-l">Ago</span><span class="m-s" aria-hidden="true">A</span></th>
+              <th scope="col" data-m="9"><span class="m-l">Sep</span><span class="m-s" aria-hidden="true">S</span></th>
+              <th scope="col" data-m="10"><span class="m-l">Oct</span><span class="m-s" aria-hidden="true">O</span></th>
+              <th scope="col" data-m="11"><span class="m-l">Nov</span><span class="m-s" aria-hidden="true">N</span></th>
+              <th scope="col" data-m="12"><span class="m-l">Dic</span><span class="m-s" aria-hidden="true">D</span></th>
+            </tr>
+          </thead>
+          <tbody class="cal__body"></tbody>
+        </table>
+      </div>
+      <p class="cal__legend mono"><span class="cal__key"></span> Cosecha &nbsp; <span class="cal__now-key"></span> Mes actual</p>
+    </div>
+  </section>
+
+  <!-- ============ GUÍA ============ -->
+  <section class="guia" id="guia" data-tone="skin">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Guía</p>
+        <h2 class="h2" data-split>¿Está en su punto?</h2>
+        <p class="lead" data-reveal>El aguacate madura fuera del árbol. Mueve el control para ver cómo cambia y qué hacer en cada momento.</p>
+      </div>
+      <div class="guia__grid">
+        <div class="ripe" data-reveal>
+          <div class="ripe__visual" aria-hidden="true">
+            <svg class="ripe__avo" viewBox="0 0 200 280">
+              <use href="#s-avo" class="ripe__skin"/>
+              <use href="#s-avo" fill="#000" opacity=".18" filter="url(#f-pebble)"/>
+              <ellipse cx="72" cy="118" rx="18" ry="48" transform="rotate(22 72 118)" fill="url(#g-sheen)"/>
+            </svg>
+          </div>
+          <div class="ripe__ui">
+            <label class="ripe__label mono" for="ripe-range">Madurez</label>
+            <input class="ripe__range" id="ripe-range" type="range" min="0" max="100" value="62" step="1">
+            <div class="ripe__scale mono" aria-hidden="true"><span>Duro</span><span>Casi</span><span>En su punto</span><span>Pasado</span></div>
+            <p class="ripe__state" aria-live="polite"><strong class="ripe__title">En su punto</strong><span class="ripe__text">Cede un poco al presionar junto al rabito. Ábrelo hoy.</span></p>
+          </div>
+        </div>
+        <ul class="tips" data-reveal-group>
+          <li class="tip">
+            <h3>Tacto antes que color</h3>
+            <p>Presiona con suavidad cerca del rabito, sin usar la punta de los dedos. Si cede un poco, está listo.</p>
+          </li>
+          <li class="tip">
+            <h3>El truco del rabito</h3>
+            <p>Levanta el rabito. Si debajo está verde, perfecto. Si está marrón, se ha pasado.</p>
+          </li>
+          <li class="tip">
+            <h3>¿Lo quieres antes?</h3>
+            <p>Mételo en una bolsa de papel con un plátano o una manzana. El etileno que sueltan acelera la maduración.</p>
+          </li>
+          <li class="tip">
+            <h3>Maduro, a la nevera</h3>
+            <p>Cuando esté en su punto, el frío lo frena y aguanta unos días más. Abierto, con zumo de limón y film pegado a la pulpa.</p>
+          </li>
+        </ul>
+      </div>
+      <p class="guia__note mono">En el Hass la piel se oscurece al madurar. En el Bacon apenas cambia de color, así que fíate del tacto.</p>
+    </div>
+  </section>
+
+  <!-- ============ TIKTOK / REDES ============ -->
+  <section class="social" id="tiktok" data-tone="flesh">
+    <div class="wrap social__grid">
+      <div class="social__copy">
+        <p class="eyebrow">Síguenos</p>
+        <h2 class="h2" data-split>La finca, en directo desde el móvil.</h2>
+        <p class="lead" data-reveal>Cosechas, poda, días de lluvia y todo lo que pasa entre un árbol y otro. Lo contamos en TikTok e Instagram.</p>
+        <div class="social__actions" data-reveal>
+          <a class="btn" data-social="tiktok" href="https://www.tiktok.com/@regodoscampos2" target="_blank" rel="noopener" data-magnetic data-cursor="Seguir"><span>TikTok <b data-handle="tiktok">@regodoscampos2</b></span><svg class="icon" aria-hidden="true"><use href="#s-out"/></svg></a>
+          <a class="btn btn--ghost" data-social="instagram" href="https://www.instagram.com/regodoscampos/" target="_blank" rel="noopener" data-cursor="Seguir"><span>Instagram</span><svg class="icon" aria-hidden="true"><use href="#s-out"/></svg></a>
+        </div>
+      </div>
+      <div class="social__visual" aria-hidden="true">
+        <div class="phone">
+          <div class="phone__screen">
+            <svg class="phone__land" viewBox="0 0 300 640" preserveAspectRatio="xMidYMax slice">
+              <path d="M0 430C60 400 110 410 160 392C210 374 250 380 300 366V640H0Z" fill="#5B7A50" opacity=".7"/>
+              <path d="M0 480C70 452 120 470 180 446C230 426 270 436 300 428V640H0Z" fill="#35552F"/>
+              <path d="M0 540C80 512 150 530 210 508C250 494 280 500 300 496V640H0Z" fill="#20361C"/>
+              <g fill="#16280F">
+                <circle cx="40" cy="468" r="15"/><circle cx="84" cy="460" r="17"/><circle cx="130" cy="452" r="15"/><circle cx="176" cy="440" r="17"/><circle cx="222" cy="430" r="15"/><circle cx="266" cy="424" r="16"/>
+              </g>
+            </svg>
+            <div class="phone__rain"></div>
+            <svg class="phone__avo" viewBox="0 0 200 280"><use href="#s-avo" fill="url(#g-skin)" filter="url(#f-pebble)"/><ellipse cx="72" cy="118" rx="18" ry="48" transform="rotate(22 72 118)" fill="url(#g-sheen)"/></svg>
+            <span class="phone__chip">Desde la finca</span>
+            <div class="phone__side">
+              <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M14 5l6 6-6 6M20 11H9a5 5 0 0 0-5 5v3"/></svg>
+            </div>
+            <div class="phone__caption">
+              <strong data-handle="tiktok">@regodoscampos2</strong>
+              <span>Vídeos de la finca, la cosecha y el día a día.</span>
+            </div>
+          </div>
+        </div>
+        <span class="sticker sticker--a">Cosecha</span>
+        <span class="sticker sticker--b">Choiva</span>
+        <span class="sticker sticker--c">Paciencia</span>
+      </div>
+    </div>
+    <div class="wrap social__videos" hidden></div>
+  </section>
+
+  <!-- ============ PEDIDOS ============ -->
+  <section class="pedidos" id="pedidos" data-tone="mist">
+    <div class="wrap pedidos__grid">
+      <div class="pedidos__copy">
+        <p class="eyebrow">Pedidos</p>
+        <h2 class="h2" data-split>Pide tus aguacates.</h2>
+        <p class="lead" data-reveal>Cuéntanos qué necesitas y te respondemos con la disponibilidad, el precio y cuándo te lo podemos hacer llegar. También para tiendas y restaurantes.</p>
+        <ul class="channels" data-reveal-group>
+          <li data-channel="whatsapp" hidden><span class="mono">WhatsApp</span><a href="#" target="_blank" rel="noopener"></a></li>
+          <li data-channel="email" hidden><span class="mono">Email</span><a href="#"></a></li>
+          <li><span class="mono">TikTok</span><a data-social="tiktok" href="https://www.tiktok.com/@regodoscampos2" target="_blank" rel="noopener" data-handle="tiktok">@regodoscampos2</a></li>
+          <li><span class="mono">Instagram</span><a data-social="instagram" href="https://www.instagram.com/regodoscampos/" target="_blank" rel="noopener" data-handle="instagram">@regodoscampos</a></li>
+        </ul>
+      </div>
+
+      <form class="order" id="order-form" novalidate data-reveal>
+        <div class="field">
+          <label for="f-name">Nombre</label>
+          <input id="f-name" name="nombre" type="text" autocomplete="name" required placeholder="Cómo te llamas">
+          <p class="field__error" id="f-name-err" hidden>Escribe tu nombre para saber a quién responder.</p>
+        </div>
+        <div class="field">
+          <label for="f-contact">Teléfono o email</label>
+          <input id="f-contact" name="contacto" type="text" autocomplete="email" required placeholder="Donde te contestamos">
+          <p class="field__error" id="f-contact-err" hidden>Necesitamos un teléfono o un email para responderte.</p>
+        </div>
+        <div class="field">
+          <label for="f-place">Localidad</label>
+          <input id="f-place" name="localidad" type="text" autocomplete="address-level2" placeholder="Por ejemplo, Vigo">
+        </div>
+        <fieldset class="field">
+          <legend>Cantidad aproximada</legend>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="cantidad" id="q-2" value="2 kg"><span>2 kg</span></label>
+            <label class="chip"><input type="radio" name="cantidad" id="q-5" value="5 kg" checked><span>5 kg</span></label>
+            <label class="chip"><input type="radio" name="cantidad" id="q-10" value="10 kg"><span>10 kg</span></label>
+            <label class="chip"><input type="radio" name="cantidad" id="q-pro" value="hostelería o tienda"><span>Hostelería o tienda</span></label>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="f-msg">Mensaje <span class="optional">opcional</span></label>
+          <textarea id="f-msg" name="mensaje" rows="3" placeholder="Fechas, dudas, lo que quieras contarnos"></textarea>
+        </div>
+        <button class="btn order__submit" type="submit" data-magnetic><span>Preparar pedido</span><svg class="icon" aria-hidden="true"><use href="#s-arrow"/></svg></button>
+
+        <div class="order__result" id="order-result" hidden aria-live="polite">
+          <p class="order__result-title">Tu mensaje está listo</p>
+          <p class="order__msg" id="order-msg"></p>
+          <div class="order__actions">
+            <a class="btn btn--small" data-send="whatsapp" href="#" target="_blank" rel="noopener" hidden><span>Enviar por WhatsApp</span></a>
+            <a class="btn btn--small" data-send="email" href="#" hidden><span>Enviar por email</span></a>
+            <button class="btn btn--small btn--ghost" type="button" data-copy><span>Copiar mensaje</span></button>
+          </div>
+          <p class="order__hint">Si lo prefieres, pégalo en un mensaje directo de <a data-social="instagram" href="https://www.instagram.com/regodoscampos/" target="_blank" rel="noopener">Instagram</a> o <a data-social="tiktok" href="https://www.tiktok.com/@regodoscampos2" target="_blank" rel="noopener">TikTok</a>.</p>
+        </div>
+      </form>
+    </div>
+
+    <div class="wrap faq">
+      <h2 class="faq__title">Preguntas frecuentes</h2>
+      <details>
+        <summary>¿Cómo hago un pedido?</summary>
+        <p>Rellena el formulario o escríbenos por Instagram o TikTok. Te confirmamos disponibilidad, precio y entrega.</p>
+      </details>
+      <details>
+        <summary>¿Cuándo hay aguacates?</summary>
+        <p>La cosecha gallega se concentra en otoño e invierno y, según la variedad, se alarga hasta la primavera. Mira el <a href="#temporada">calendario de temporada</a>.</p>
+      </details>
+      <details>
+        <summary>¿Por qué llegan duros?</summary>
+        <p>Porque el aguacate madura fuera del árbol. Llega firme para que no se golpee y en unos días a temperatura ambiente estará listo.</p>
+      </details>
+      <details>
+        <summary>¿Cómo los conservo?</summary>
+        <p>Hasta que maduren, fuera de la nevera. Cuando cedan al tacto, a la nevera: así aguantan unos días más.</p>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer" data-tone="skin">
+  <div class="wrap">
+    <div class="footer__top">
+      <p class="footer__claim">Feito en Galicia, con choiva e paciencia.</p>
+      <div class="footer__cols">
+        <nav aria-label="Pie de página">
+          <p class="mono">Navegación</p>
+          <ul>
+            <li><a href="#finca">La finca</a></li>
+            <li><a href="#proceso">Proceso</a></li>
+            <li><a href="#temporada">Temporada</a></li>
+            <li><a href="#pedidos">Pedidos</a></li>
+          </ul>
+        </nav>
+        <div>
+          <p class="mono">Síguenos</p>
+          <ul>
+            <li><a data-social="tiktok" href="https://www.tiktok.com/@regodoscampos2" target="_blank" rel="noopener">TikTok</a></li>
+            <li><a data-social="instagram" href="https://www.instagram.com/regodoscampos/" target="_blank" rel="noopener">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p class="footer__word" aria-hidden="true"><span>Rego</span> <span>dos</span> <span>Campos</span></p>
+    <div class="footer__bottom mono">
+      <span>© <span data-year>2026</span> Rego dos Campos</span>
+      <a href="#top">Volver arriba</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/vendor/gsap.min.js"></script>
+<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<script src="assets/vendor/SplitText.min.js"></script>
+<script src="assets/vendor/DrawSVGPlugin.min.js"></script>
+<script src="assets/vendor/lenis.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
