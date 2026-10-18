@@ -1219,8 +1219,9 @@ html.reduced-motion .scroll-cue i::after { animation: none; }
   .m-s { display: inline; }
   .cal { border-spacing: 0 .45rem; }
   .cal tbody th { padding-right: .5rem; }
-  .finca { min-height: 1000px; }
-  .finca__land { top: auto; bottom: 20%; height: 50%; }
+  .finca { min-height: 1180px; }
+  .finca__land { top: 5%; bottom: auto; height: 57%; -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 80%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 80%, transparent); }
+  .finca__inner { padding-top: calc(var(--section) * .8); }
   .covers { grid-template-columns: 1fr; }
   .cover { aspect-ratio: 16 / 10; }
   .handle__net { display: none; }
