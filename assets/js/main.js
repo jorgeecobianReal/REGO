@@ -1,6 +1,7 @@
 /* =====================================================================
    Rego dos Campos · interacción y animación
    Librerías: GSAP 3.15 (ScrollTrigger, SplitText, DrawSVG) + Lenis 1.3
+   La escena 3D vive en assets/js/scene.js y expone window.REGO_SCENE.
    ===================================================================== */
 (function () {
   'use strict';
@@ -19,6 +20,7 @@
   var INSTAGRAM = clean(C.instagram);
   var WHATSAPP = String(C.whatsapp || '').replace(/\D/g, '');
   var EMAIL = String(C.email || '').trim();
+  var smoothstep = function (a, b, v) { var t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
 
   /* ------------------------------------------------------------------
      1. Contenido que sale de config.js
@@ -33,14 +35,11 @@
   }
 
   function applyConfig() {
-    $$('[data-social="tiktok"]').forEach(function (a) {
-      if (TIKTOK) a.href = 'https://www.tiktok.com/@' + TIKTOK;
-    });
-    $$('[data-social="instagram"]').forEach(function (a) {
-      if (INSTAGRAM) a.href = 'https://www.instagram.com/' + INSTAGRAM + '/';
-    });
+    $$('[data-social="tiktok"]').forEach(function (a) { if (TIKTOK) a.href = 'https://www.tiktok.com/@' + TIKTOK; });
+    $$('[data-social="instagram"]').forEach(function (a) { if (INSTAGRAM) a.href = 'https://www.instagram.com/' + INSTAGRAM + '/'; });
     $$('[data-handle="tiktok"]').forEach(function (el) { if (TIKTOK) el.textContent = '@' + TIKTOK; });
     $$('[data-handle="instagram"]').forEach(function (el) { if (INSTAGRAM) el.textContent = '@' + INSTAGRAM; });
+    $$('[data-handle-bare="tiktok"]').forEach(function (el) { if (TIKTOK) el.textContent = TIKTOK; });
 
     var waItem = $('[data-channel="whatsapp"]');
     if (WHATSAPP && waItem) {
@@ -211,9 +210,7 @@
 
       var wasHidden = result.hidden;
       result.hidden = false;
-      if (window.gsap && wasHidden && !reduce) {
-        gsap.from(result, { autoAlpha: 0, y: 24, duration: .8, ease: 'power3.out' });
-      }
+      if (window.gsap && wasHidden && !reduce) gsap.from(result, { autoAlpha: 0, y: 24, duration: .8, ease: 'power3.out' });
       if (window.ScrollTrigger) ScrollTrigger.refresh();
     });
 
@@ -228,9 +225,7 @@
         label.textContent = 'Texto seleccionado';
       };
       try {
-        navigator.clipboard.writeText(msg.textContent).then(function () {
-          label.textContent = 'Copiado';
-        }, selectText);
+        navigator.clipboard.writeText(msg.textContent).then(function () { label.textContent = 'Copiado'; }, selectText);
       } catch (err) { selectText(); }
     });
   }
@@ -270,7 +265,7 @@
   }
 
   /* ------------------------------------------------------------------
-     6. Lienzos: lluvia y paisaje gallego generado
+     6. Paisaje gallego en canvas (sección La finca)
      ------------------------------------------------------------------ */
   function seeded(seed) {
     return function () {
@@ -360,25 +355,17 @@
     return { repaint: function () { paint(0); } };
   }
 
-  function heroRainScene() {
-    var rain = createRain({ color: 'rgba(23, 32, 21, .10)', density: .45, min: 10, max: 24, angle: .16 });
-    return {
-      resize: function (w, h) { rain.resize(w, h); },
-      frame: function (ctx, w, h, dt) { ctx.clearRect(0, 0, w, h); rain.draw(ctx, w, h, dt); }
-    };
-  }
-
   function landScene() {
     var layers = [
-      { base: .55, amp: .045, f: [1.1, 2.6], ph: [.3, 1.7], fill: '#56744C', alpha: .5, par: .15 },
-      { base: .63, amp: .05, f: [1.5, 3.7], ph: [2.1, .4], fill: '#3E5F37', tree: '#2D4C28', size: 6, rows: 2, par: .32 },
-      { base: .72, amp: .045, f: [1.25, 3.1], ph: [1.2, 2.6], fill: '#2C4927', tree: '#1F381C', size: 10, rows: 3, par: .52 },
-      { base: .82, amp: .04, f: [2.0, 4.4], ph: [.8, 1.1], fill: '#1B2F18', tree: '#10200E', size: 16, rows: 2, par: .78 }
+      { base: .52, amp: .045, f: [1.1, 2.6], ph: [.3, 1.7], fill: '#3F5A3E', alpha: .55, par: .15 },
+      { base: .61, amp: .05, f: [1.5, 3.7], ph: [2.1, .4], fill: '#2F4A31', tree: '#223A25', size: 6, rows: 2, par: .32 },
+      { base: .71, amp: .045, f: [1.25, 3.1], ph: [1.2, 2.6], fill: '#223A26', tree: '#182C1B', size: 10, rows: 3, par: .52 },
+      { base: .82, amp: .04, f: [2.0, 4.4], ph: [.8, 1.1], fill: '#15261A', tree: '#0E1B11', size: 16, rows: 2, par: .78 }
     ];
     var trees = [];
     var mist = [];
     var progress = .5;
-    var rain = createRain({ color: 'rgba(232, 236, 221, .16)', density: .7, min: 12, max: 28, angle: .2, speed: 1.1 });
+    var rain = createRain({ color: 'rgba(236, 235, 223, .16)', density: .7, min: 12, max: 28, angle: .2, speed: 1.1 });
     var ridge = function (L, nx) {
       return L.base + L.amp * (Math.sin(nx * L.f[0] * Math.PI + L.ph[0]) * .65 + Math.sin(nx * L.f[1] * Math.PI + L.ph[1]) * .35);
     };
@@ -412,10 +399,9 @@
       },
       frame: function (ctx, w, h, dt) {
         ctx.clearRect(0, 0, w, h);
-
-        var sun = ctx.createRadialGradient(w * .78, h * .2, 0, w * .78, h * .2, Math.max(w, h) * .45);
-        sun.addColorStop(0, 'rgba(226, 227, 143, .12)');
-        sun.addColorStop(1, 'rgba(226, 227, 143, 0)');
+        var sun = ctx.createRadialGradient(w * .78, h * .22, 0, w * .78, h * .22, Math.max(w, h) * .45);
+        sun.addColorStop(0, 'rgba(217, 222, 126, .13)');
+        sun.addColorStop(1, 'rgba(217, 222, 126, 0)');
         ctx.fillStyle = sun;
         ctx.fillRect(0, 0, w, h);
 
@@ -450,7 +436,7 @@
               canopy(ctx, tr.x, by - tr.s * .3, tr.s);
             }
             ctx.fill();
-            ctx.fillStyle = 'rgba(226, 227, 143, .07)';
+            ctx.fillStyle = 'rgba(217, 222, 126, .07)';
             ctx.beginPath();
             for (t = 0; t < list.length; t++) {
               tr = list[t];
@@ -464,9 +450,9 @@
           if (i < layers.length - 1) {
             var my = ridge(L, .5) * h + off;
             var g = ctx.createLinearGradient(0, my - h * .05, 0, my + h * .09);
-            g.addColorStop(0, 'rgba(228, 233, 225, 0)');
-            g.addColorStop(.5, 'rgba(228, 233, 225, .08)');
-            g.addColorStop(1, 'rgba(228, 233, 225, 0)');
+            g.addColorStop(0, 'rgba(236, 235, 223, 0)');
+            g.addColorStop(.5, 'rgba(236, 235, 223, .08)');
+            g.addColorStop(1, 'rgba(236, 235, 223, 0)');
             ctx.fillStyle = g;
             ctx.fillRect(0, my - h * .05, w, h * .14);
           }
@@ -480,8 +466,8 @@
           ctx.translate(b.x, b.y * h);
           ctx.scale(1, b.k);
           var mg = ctx.createRadialGradient(0, 0, 0, 0, 0, b.rx);
-          mg.addColorStop(0, 'rgba(228, 233, 225, .10)');
-          mg.addColorStop(1, 'rgba(228, 233, 225, 0)');
+          mg.addColorStop(0, 'rgba(236, 235, 223, .10)');
+          mg.addColorStop(1, 'rgba(236, 235, 223, 0)');
           ctx.fillStyle = mg;
           ctx.beginPath();
           ctx.arc(0, 0, b.rx, 0, Math.PI * 2);
@@ -505,10 +491,36 @@
 
   var land = landScene();
   var landCanvas = mountCanvas($('.finca__land'), land);
-  if (!reduce) mountCanvas($('.hero__rain'), heroRainScene());
+
+  /* Escena 3D: encendido solo cuando está en pantalla */
+  var scene3d = window.REGO_SCENE || null;
+  window.addEventListener('rego:scene', function (e) { scene3d = e.detail; wireScene(); });
+  function wireScene() {
+    if (!scene3d) return;
+    if (reduce) { scene3d.setReduced(true); scene3d.setProgress(0); return; }
+    var sec = $('.scene');
+    var visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        visible = entries[0].isIntersecting;
+        if (visible && !document.hidden) scene3d.start(); else scene3d.stop();
+      }, { rootMargin: '120px' }).observe(sec);
+    } else scene3d.start();
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) scene3d.stop(); else if (visible) scene3d.start();
+    });
+    if (finePointer) {
+      sec.addEventListener('pointermove', function (e) {
+        scene3d.setPointer(e.clientX / window.innerWidth - .5, e.clientY / window.innerHeight - .5);
+      });
+      sec.addEventListener('pointerleave', function () { scene3d.setPointer(0, 0); });
+    }
+  }
+  wireScene();
 
   if (!window.gsap || !window.ScrollTrigger) {
-    html.classList.add('loaded', 'static-open');
+    html.classList.add('loaded');
+    if (scene3d) scene3d.start();
     return;
   }
 
@@ -527,7 +539,6 @@
     gsap.ticker.lagSmoothing(0);
   }
 
-  // Enlaces internos con scroll suave
   document.addEventListener('click', function (e) {
     var a = e.target.closest('a[href^="#"]');
     if (!a) return;
@@ -571,7 +582,7 @@
 
   /* ---------- Intro del hero ---------- */
   function heroIntro() {
-    var tl = gsap.timeline({ paused: true, defaults: { ease: 'expo.out' }, onComplete: idle });
+    var tl = gsap.timeline({ paused: true, defaults: { ease: 'expo.out' }, onComplete: function () { html.classList.add('intro-done'); } });
     var title = $('.hero__title');
     if (hasSplit) {
       var split = SplitText.create(title, { type: 'lines,words', mask: 'lines', linesClass: 'split-line' });
@@ -583,27 +594,21 @@
       .from('.hero__eyebrow', { autoAlpha: 0, y: 14, duration: 1 }, .15)
       .from('.hero__lead', { autoAlpha: 0, y: 26, duration: 1.3 }, .5)
       .from('.hero__actions > *', { autoAlpha: 0, y: 26, duration: 1.2, stagger: .08 }, .6)
-      .from('.hero__halo', { scale: .4, autoAlpha: 0, duration: 2.2 }, 0)
-      .from('.hero__float', { autoAlpha: 0, yPercent: 16, rotation: -16, scale: .82, duration: 2, ease: 'elastic.out(1, .7)' }, .15)
-      .from('.hero__leaf', { rotation: -38, svgOrigin: '131 76', duration: 2, ease: 'elastic.out(1, .45)' }, .45)
-      .from('.hero__shadow', { scaleX: .3, autoAlpha: 0, duration: 1.6 }, .3)
-      .from('.tag', { autoAlpha: 0, scale: .8, y: 12, duration: 1.1, stagger: .14, ease: 'back.out(2)' }, 1)
-      .from('.hero__foot > *', { autoAlpha: 0, y: 12, duration: 1, stagger: .1 }, 1);
+      .from('.scene__foot > *', { autoAlpha: 0, y: 12, duration: 1, stagger: .1 }, 1);
+    if (scene3d) {
+      var cam = { v: 0 };
+      scene3d.setProgress(0);
+    }
     return tl;
-  }
-
-  function idle() {
-    gsap.to('.hero__avo', { y: -14, rotation: 2.5, transformOrigin: '50% 60%', duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-    gsap.to('.hero__shadow', { scaleX: .86, opacity: .7, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-    gsap.to('.hero__leaf', { rotation: 6, svgOrigin: '131 76', duration: 2.6, ease: 'sine.inOut', yoyo: true, repeat: -1 });
   }
 
   /* ---------- Inicio ---------- */
   function init() {
     if (reduce) {
-      html.classList.add('loaded');
+      html.classList.add('loaded', 'intro-done');
     } else {
       var intro = heroIntro();
+      if (scene3d) scene3d.start();
       if (useLoader) {
         gsap.timeline({ onComplete: function () { html.classList.add('loaded'); if (lenis) lenis.start(); } })
           .to('.loader__inner', { yPercent: -25, autoAlpha: 0, duration: .7, ease: 'power3.in' }, 0)
@@ -616,9 +621,9 @@
       }
     }
 
+    sceneStory();
     pins();
     reveals();
-    hero();
     marquee();
     finca();
     chrome();
@@ -626,46 +631,53 @@
     ScrollTrigger.refresh();
   }
 
-  /* ---------- Secciones fijadas (pins) ---------- */
+  /* ---------- Historia de scroll del hero: el aguacate se abre ---------- */
+  function sceneStory() {
+    var sec = $('.scene');
+    if (!sec || reduce) return;
+    var heroLayer = $('.scene__hero');
+    var openLayer = $('.scene__open');
+    var foot = $('.scene__foot');
+    var scrim = $('.scene__scrim');
+    var fbClosed = $('.scene__fallback-img--closed');
+    var fbOpen = $('.scene__fallback-img--open');
+    var items = $$('.anatomy__item', openLayer);
+    var lastOpen = null;
+    var apply = function (p) {
+      var e = smoothstep(.14, .72, p);
+      if (scene3d) scene3d.setProgress(e);
+      var h = 1 - smoothstep(.03, .2, p);
+      gsap.set(heroLayer, { opacity: h, y: -36 * (1 - h) });
+      heroLayer.style.pointerEvents = h > .5 ? 'auto' : 'none';
+      var o = smoothstep(.56, .78, p);
+      gsap.set(openLayer, { opacity: o, y: 24 * (1 - o) });
+      openLayer.style.pointerEvents = o > .5 ? 'auto' : 'none';
+      items.forEach(function (it, i) {
+        var k = smoothstep(.6 + i * .06, .84 + i * .06, p);
+        gsap.set(it, { opacity: k, x: (i === 0 ? -1 : 1) * 18 * (1 - k) });
+      });
+      var isOpen = o > .5;
+      if (isOpen !== lastOpen) { openLayer.setAttribute('aria-hidden', isOpen ? 'false' : 'true'); lastOpen = isOpen; }
+      gsap.set(foot, { opacity: 1 - smoothstep(.02, .12, p) });
+      if (scrim) scrim.style.opacity = h;
+      if (fbClosed) { var f = smoothstep(.35, .55, p); gsap.set(fbClosed, { opacity: 1 - f }); gsap.set(fbOpen, { opacity: f }); }
+    };
+    ScrollTrigger.create({ trigger: sec, start: 'top top', end: 'bottom bottom', scrub: true, onUpdate: function (self) { apply(self.progress); } });
+    apply(0);
+  }
+
+  /* ---------- Proceso: recorrido horizontal ---------- */
   function pins() {
     var mm = gsap.matchMedia();
-
-    // El aguacate se abre por la mitad
-    mm.add({
-      desk: '(min-width: 901px) and (min-height: 600px)',
-      motion: '(prefers-reduced-motion: no-preference)'
-    }, function (ctx) {
-      if (!ctx.conditions.motion) return;
-      var desk = ctx.conditions.desk;
-      var L = $('.avo-half--l'), R = $('.avo-half--r');
-      gsap.set([L, R], { x: 0, xPercent: 0, rotation: 0, rotationX: 0, rotationY: 0 });
-      var tl = gsap.timeline({
-        defaults: { ease: 'power2.inOut' },
-        scrollTrigger: desk
-          ? { trigger: '.open', start: 'top top', end: '+=130%', pin: '.open__pin', scrub: 1, anticipatePin: 1 }
-          : { trigger: '.open__stage', start: 'top 80%', end: 'center 40%', scrub: 1 }
-      });
-      tl.to(L, { xPercent: -56, rotation: -9, rotationY: -180, duration: 1 }, 0)
-        .to(R, { xPercent: 56, rotation: 9, rotationY: 180, duration: 1 }, 0)
-        .from('.avo-pit', { scale: .4, transformOrigin: '50% 50%', duration: .3, ease: 'back.out(2.5)' }, .7)
-        .from('.anatomy__item', { autoAlpha: 0, y: 26, stagger: .1, duration: .35, ease: 'power2.out' }, .68);
-      if (desk) tl.to({}, { duration: .3 });
-    });
-
-    // Proceso: recorrido horizontal en escritorio
-    mm.add({
-      wide: '(min-width: 901px)',
-      motion: '(prefers-reduced-motion: no-preference)'
-    }, function (ctx) {
+    mm.add({ wide: '(min-width: 901px)', motion: '(prefers-reduced-motion: no-preference)' }, function (ctx) {
       if (!ctx.conditions.motion) return;
       var track = $('.proceso__track');
       var steps = $$('.step');
       var bar = $('.proceso__bar span');
       var draw = function (step, trigger) {
         if (!hasDraw) return;
-        gsap.from($$('.step__icon path, .step__icon circle', step), Object.assign({ drawSVG: '0%', duration: 1.4, stagger: .12, ease: 'power2.inOut' }, { scrollTrigger: trigger }));
+        gsap.from($$('.step__icon path, .step__icon circle', step), { drawSVG: '0%', duration: 1.4, stagger: .12, ease: 'power2.inOut', scrollTrigger: trigger });
       };
-
       if (ctx.conditions.wide) {
         var dist = function () { return Math.max(0, track.scrollWidth - document.documentElement.clientWidth); };
         var tween = gsap.to(track, {
@@ -712,7 +724,6 @@
           }
         });
       });
-
       var mText = $('.manifesto__text');
       if (mText) {
         var ms = SplitText.create(mText, { type: 'words', wordsClass: 'mw' });
@@ -721,6 +732,10 @@
           scrollTrigger: { trigger: mText, start: 'top 80%', end: 'bottom 50%', scrub: .6 }
         });
       }
+    }
+
+    if (hasDraw) {
+      gsap.from('.rego-line__path', { drawSVG: '0%', duration: 2.4, ease: 'power2.inOut', scrollTrigger: { trigger: '.rego-line', start: 'top 85%', once: true } });
     }
 
     $$('[data-reveal]').forEach(function (el) {
@@ -735,34 +750,17 @@
       scrollTrigger: { trigger: '.cal', start: 'top 82%', once: true }
     });
 
-    gsap.from('.phone', { yPercent: 12, rotation: 6, autoAlpha: 0, duration: 1.6, ease: 'expo.out', scrollTrigger: { trigger: '.social__visual', start: 'top 80%', once: true } });
-    gsap.from('.sticker', { scale: 0, autoAlpha: 0, duration: 1, stagger: .12, ease: 'back.out(2.4)', scrollTrigger: { trigger: '.social__visual', start: 'top 70%', once: true } });
-    gsap.to('.phone', { yPercent: -8, ease: 'none', scrollTrigger: { trigger: '.social', start: 'top bottom', end: 'bottom top', scrub: true } });
+    var handle = $('.handle');
+    if (handle) {
+      gsap.from(handle, { autoAlpha: 0, y: 40, duration: 1.4, ease: 'expo.out', scrollTrigger: { trigger: handle, start: 'top 88%', once: true } });
+    }
+    gsap.to('.cover--a', { yPercent: -6, ease: 'none', scrollTrigger: { trigger: '.covers', start: 'top bottom', end: 'bottom top', scrub: true } });
+    gsap.to('.cover--c', { yPercent: 6, ease: 'none', scrollTrigger: { trigger: '.covers', start: 'top bottom', end: 'bottom top', scrub: true } });
 
     gsap.from('.footer__word span', { yPercent: 105, duration: 1.4, ease: 'expo.out', stagger: .09, scrollTrigger: { trigger: '.footer__word', start: 'top 95%', once: true } });
 
     $$('.faq details').forEach(function (d, i) {
       gsap.from(d, { autoAlpha: 0, y: 20, duration: .9, delay: i * .06, ease: 'power3.out', scrollTrigger: { trigger: d, start: 'top 92%', once: true } });
-    });
-  }
-
-  /* ---------- Hero: parallax y ratón ---------- */
-  function hero() {
-    if (reduce) return;
-    gsap.to('.hero__visual', { yPercent: 12, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
-    gsap.to('.hero__copy', { y: -50, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
-
-    if (!finePointer) return;
-    var heroEl = $('.hero');
-    var xTo = gsap.quickTo('.hero__float', 'x', { duration: 1.2, ease: 'power3' });
-    var yTo = gsap.quickTo('.hero__float', 'y', { duration: 1.2, ease: 'power3' });
-    var taX = gsap.quickTo('.tag--a', 'x', { duration: 1.4, ease: 'power3' });
-    var tbX = gsap.quickTo('.tag--b', 'x', { duration: 1.4, ease: 'power3' });
-    heroEl.addEventListener('pointermove', function (e) {
-      var r = heroEl.getBoundingClientRect();
-      var nx = (e.clientX - r.left) / r.width - .5;
-      var ny = (e.clientY - r.top) / r.height - .5;
-      xTo(nx * 34); yTo(ny * 22); taX(-nx * 22); tbX(nx * 26);
     });
   }
 
@@ -842,9 +840,9 @@
 
   /* ---------- Cambio de tono por secciones ---------- */
   function tones() {
-    var vars = ['--bg', '--fg', '--muted', '--line', '--soft', '--glow', '--accent', '--on-accent'];
+    var vars = ['--bg', '--fg', '--muted', '--line', '--soft', '--accent', '--on-accent', '--glow'];
     var palette = {};
-    ['mist', 'skin', 'leaf', 'flesh'].forEach(function (name) {
+    ['night', 'moss', 'cream'].forEach(function (name) {
       var probe = document.createElement('div');
       probe.className = 'tone-' + name;
       probe.hidden = true;
@@ -857,7 +855,7 @@
 
     html.classList.add('js-tones');
     var meta = $('meta[name="theme-color"]');
-    var current = 'mist';
+    var current = 'night';
     var apply = function (name) {
       if (!palette[name] || name === current) return;
       current = name;
@@ -865,25 +863,21 @@
       if (meta) meta.setAttribute('content', palette[name]['--bg']);
     };
 
-    var sections = $$('[data-tone]');
+    var sections = $$('[data-tone]').filter(function (s) { return getComputedStyle(s).display !== 'none'; });
     var triggers = [];
+    var pick = function () {
+      var active = triggers.filter(function (t) { return t.isActive; });
+      if (active.length) apply(active[active.length - 1].vars.trigger.getAttribute('data-tone'));
+    };
     sections.forEach(function (sec, i) {
       var isLast = i === sections.length - 1;
       triggers.push(ScrollTrigger.create({
         trigger: sec,
         start: isLast ? 'top 75%' : 'top 50%',
         end: 'bottom 50%',
-        onToggle: function () {
-          var active = triggers.filter(function (t) { return t.isActive; });
-          if (active.length) apply(active[active.length - 1].vars.trigger.getAttribute('data-tone'));
-        }
+        onToggle: pick
       }));
     });
-
-    // Tono correcto si la página se abre a mitad de scroll
-    ScrollTrigger.addEventListener('refresh', function () {
-      var active = triggers.filter(function (t) { return t.isActive; });
-      if (active.length) apply(active[active.length - 1].vars.trigger.getAttribute('data-tone'));
-    });
+    ScrollTrigger.addEventListener('refresh', pick);
   }
 })();

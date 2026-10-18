@@ -1,0 +1,14 @@
+{
+  "name": "rego-dos-campos-web",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Web de Rego dos Campos, finca de aguacates en Galicia",
+  "scripts": {
+    "build:scene": "esbuild src/scene.js --bundle --minify --format=iife --target=es2019 --outfile=assets/js/scene.js --legal-comments=none",
+    "serve": "python3 -m http.server 8000"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10",
+    "three": "0.186.1"
+  }
+}

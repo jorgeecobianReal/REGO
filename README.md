@@ -1,45 +1,43 @@
 # Rego dos Campos · web
 
 Web de **Rego dos Campos**, finca de aguacates en Galicia.
-Es una web estática de una sola página. No necesita instalación ni compilación: se sube tal cual a cualquier hosting.
+Web estática de una sola página. Se sube tal cual a cualquier hosting: no necesita servidor ni instalación.
 
-## Secciones
+## Qué tiene
 
 | Sección | Qué hace |
 |---|---|
-| Hero | Titular animado, aguacate ilustrado que flota y sigue al ratón, lluvia de fondo |
-| Ábrelo | Al hacer scroll el aguacate se abre por la mitad y aparecen piel, pulpa y hueso |
-| O nome | Qué significa *rego* en gallego, con el texto iluminándose palabra a palabra |
-| La finca | Paisaje gallego generado en tiempo real: colinas, filas de árboles, bruma y lluvia |
-| Proceso | Cinco pasos del árbol a la mesa en recorrido horizontal, con iconos que se dibujan |
-| Temporada | Calendario de cosecha por variedad con el mes actual marcado |
-| Guía | Control interactivo de madurez y consejos para saber si un aguacate está en su punto |
-| Síguenos | Bloque de TikTok e Instagram, con opción de incrustar vídeos reales |
-| Pedidos | Formulario que prepara el mensaje del pedido para WhatsApp, email o mensaje directo |
-| Pie | Logotipo grande animado y enlaces |
+| Hero | Aguacate en 3D real (WebGL) con piel rugosa de Hass, hojas, lluvia y reacción al ratón. Titular editorial con cursiva. |
+| Ábrelo | Al hacer scroll el aguacate se parte en dos mitades y aparecen pulpa, hueso y sus explicaciones. |
+| O nome | Qué significa *rego* en gallego. Un trazo de agua se dibuja al llegar y el texto se ilumina palabra a palabra. |
+| La finca | Paisaje gallego generado en tiempo real: colinas, filas de árboles, bruma y lluvia. |
+| Proceso | Cinco pasos del árbol a la mesa en recorrido horizontal, con iconos que se dibujan solos. |
+| Temporada | Calendario de cosecha por variedad con el mes actual marcado. |
+| Guía | Control interactivo de madurez y consejos para saber si un aguacate está en su punto. |
+| Síguenos | Usuario de TikTok a gran tamaño, botones y tres tarjetas con los lemas de la finca. |
+| Pedidos | Formulario que prepara el mensaje del pedido para WhatsApp, email o mensaje directo. |
+| Pie | Logotipo grande animado y enlaces. |
 
-El color de fondo cambia por secciones al hacer scroll, como un corte del terreno y del fruto: bruma, piel, hoja y pulpa.
+El fondo cambia de tono por secciones al hacer scroll: noche, musgo y crema.
 
-## Animación
+## Tecnología
 
-| Librería | Uso |
+| Pieza | Uso |
 |---|---|
-| [GSAP 3.15](https://gsap.com) | Motor de animación y líneas de tiempo |
-| ScrollTrigger | Animaciones ligadas al scroll, secciones fijadas y recorrido horizontal |
-| SplitText | Titulares que entran por líneas y texto que se ilumina por palabras |
-| DrawSVG | Iconos del proceso y logotipo del cargador que se dibujan solos |
+| [three.js 0.186](https://threejs.org) | Aguacate 3D generado por código: geometría por revolución, piel con relieve procedural, pulpa, hueso, hojas y lluvia |
+| [GSAP 3.15](https://gsap.com) + ScrollTrigger, SplitText, DrawSVG | Historia de scroll, titulares por líneas, recorrido horizontal, trazos que se dibujan |
 | [Lenis 1.3](https://lenis.darkroom.engineering) | Scroll suave sincronizado con ScrollTrigger |
-| Canvas 2D | Lluvia y paisaje generados por código, sin imágenes |
+| Canvas 2D | Paisaje y lluvia de la sección La finca |
 
-Todas las librerías están dentro de `assets/vendor/`, así que la web no depende de ninguna CDN.
-GSAP y todos sus plugins son gratuitos para uso comercial desde la versión 3.13. Las licencias están en `assets/vendor/LICENSES.md`.
+Todas las librerías van dentro del proyecto, sin CDN. GSAP y sus plugins son gratuitos para uso comercial desde la 3.13. Licencias en `assets/vendor/LICENSES.md`.
 
-La web respeta la opción del sistema "reducir movimiento": sin scroll suave, sin animaciones y con el aguacate ya abierto.
-Los lienzos animados se pausan cuando no están en pantalla.
+Si el navegador no tiene WebGL, el hero muestra dos imágenes del mismo aguacate (`assets/img/avocado-closed.png` y `avocado-open.png`).
+Con la opción del sistema "reducir movimiento" no hay scroll suave ni animaciones, el aguacate queda quieto y "Ábrelo" se muestra como sección estática.
+El 3D baja su resolución solo si el dispositivo no llega a buen ritmo, y se pausa cuando sale de pantalla.
 
 ## Cambiar datos de contacto, redes y temporada
 
-Todo está en un único archivo: `assets/js/config.js`.
+Todo está en `assets/js/config.js`:
 
 ```js
 window.REGO_CONFIG = {
@@ -53,23 +51,34 @@ window.REGO_CONFIG = {
 ```
 
 - Si se rellena `whatsapp` o `email`, aparecen en la sección de pedidos y en el formulario.
-- Si se añaden enlaces en `tiktokVideos`, la web los muestra incrustados debajo del bloque de TikTok.
+- Si se añaden enlaces en `tiktokVideos`, la web los incrusta debajo del bloque de TikTok.
 - `temporada` admite cualquier variedad y cualquier lista de meses.
 
 ## Verla en local
-
-Abrir `index.html` en el navegador ya funciona. Para probarla como en un servidor real:
 
 ```bash
 python3 -m http.server 8000
 # y abrir http://localhost:8000
 ```
 
+Abrir `index.html` directamente desde el disco también funciona.
+
+## Tocar la escena 3D
+
+La escena está escrita en `src/scene.js` y se compila a `assets/js/scene.js` con esbuild. Solo hace falta si se cambia algo del 3D:
+
+```bash
+npm install
+npm run build:scene
+```
+
+Para regenerar las imágenes de respaldo del aguacate y la imagen para redes, cualquier navegador sirve: la escena expone `window.REGO_SCENE` con `setProgress`, `setCentered`, `setRain`, `setPose` y `render`, y el canvas se puede exportar con `toDataURL`.
+
 ## Publicar
 
-- **GitHub Pages**: en el repositorio, *Settings → Pages → Deploy from a branch*, rama `main` y carpeta `/ (root)`.
-- **Netlify o Vercel**: arrastrar la carpeta del proyecto a su panel, sin configuración de build.
-- Cuando haya dominio propio, poner la URL completa en `og:image` y añadir `og:url` en `index.html` para que la vista previa en WhatsApp y redes salga siempre.
+- **GitHub Pages**: *Settings → Pages → Deploy from a branch*, rama `main`, carpeta `/ (root)`.
+- **Netlify o Vercel**: arrastrar la carpeta del proyecto, sin configuración de build.
+- Con dominio propio, poner la URL completa en `og:image` y añadir `og:url` en `index.html`.
 
 ## Pendiente de confirmar con la finca
 
@@ -80,7 +89,7 @@ Desde el entorno de trabajo no se pudo abrir TikTok ni Instagram, así que estos
 3. **Variedades y meses de cosecha.** El calendario usa Hass y Bacon con fechas orientativas.
 4. **Afirmaciones sobre la forma de trabajar**: recogida a mano, riego solo en verano, plantones injertados y cosecha cercana al pedido.
 5. **Cantidades del formulario**: 2, 5 y 10 kg y hostelería.
-6. **Fotos reales.** La web usa ilustraciones propias. Se pueden sustituir o completar con fotos de la finca.
+6. **Fotos reales.** Las tarjetas de la sección Síguenos admiten fotos de fondo de la finca si se quiere.
 
 ## Estructura
 
@@ -88,9 +97,11 @@ Desde el entorno de trabajo no se pudo abrir TikTok ni Instagram, así que estos
 index.html              Página
 assets/css/styles.css   Estilos, paleta y tipografías
 assets/js/config.js     Datos editables
-assets/js/main.js       Interacción y animaciones
+assets/js/main.js       Interacción, scroll y animaciones
+assets/js/scene.js      Escena 3D compilada
+src/scene.js            Escena 3D (fuente)
 assets/vendor/          GSAP, plugins y Lenis
-assets/img/             Favicon e imagen para compartir en redes
+assets/img/             Favicon, imágenes de respaldo del aguacate e imagen para redes
 ```
 
-Tipografías de Google Fonts: Gloock para titulares, Hanken Grotesk para texto y Spline Sans Mono para etiquetas.
+Tipografías de Google Fonts: Instrument Serif para titulares, Instrument Sans para texto y DM Mono para etiquetas.
