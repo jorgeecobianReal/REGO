@@ -1,6 +1,7 @@
 # Rego dos Campos · web
 
 Web de **Rego dos Campos**, finca de aguacates en Galicia.
+La finca no vende aguacates: la web cuenta el día a día de la finca, explica el aguacate gallego y reúne un recetario.
 Web estática de una sola página. Se sube tal cual a cualquier hosting: no necesita servidor ni instalación.
 
 ## Qué tiene
@@ -17,14 +18,14 @@ Web estática de una sola página. Se sube tal cual a cualquier hosting: no nece
 | Variedades | Fichas de Hass y Bacon con fotos de producto renderizadas desde el 3D, que se inclinan con el ratón. |
 | Temporada | Calendario de cosecha por variedad con el mes actual marcado y una frase calculada según el mes ("Ahora mismo es temporada de…" o "La próxima cosecha empieza en…"). |
 | Guía | Control interactivo de madurez y consejos para saber si un aguacate está en su punto. |
-| En la cocina | Tres recetas en pestañas (guacamole, tosta de pan de Cea con sardina, pulpo con aguacate) con ingredientes que se pueden marcar. |
+| Recetario | 13 recetas con filtros por categoría, buscador por ingrediente y ficha completa en ventana, con ingredientes que se pueden marcar y paso a la receta anterior o siguiente. |
 | Nutrición | Etiqueta nutricional por 100 g con datos de USDA FoodData Central y tres ideas clave. |
 | Pequeno dicionario | Ocho palabras gallegas del campo con su definición y traducción. |
 | Síguenos | Usuario de TikTok a gran tamaño, botones y tres tarjetas con los lemas de la finca. |
-| Pedidos | Formulario que prepara el mensaje del pedido para WhatsApp, email o mensaje directo. En móvil, un botón fijo "Pedir aguacates" acompaña durante el scroll. |
+| Preguntas | Ocho preguntas frecuentes sobre el aguacate, incluida la aclaración de que la finca no vende. |
 | Pie | Logotipo grande animado y enlaces. |
 
-El fondo cambia de tono por secciones al hacer scroll: noche, musgo y crema.
+El fondo alterna con suavidad entre dos verdes muy oscuros, noche y musgo, sin saltos bruscos de color.
 En pantallas grandes, un índice de capítulos fijo a la derecha marca la sección actual y permite saltar a cualquier parte.
 La temporada del calendario, el texto del hero y las fichas de variedades se calculan desde `config.js` y el mes actual.
 
@@ -51,16 +52,20 @@ Todo está en `assets/js/config.js`:
 window.REGO_CONFIG = {
   tiktok: 'regodoscampos2',
   instagram: 'regodoscampos',   // confirmar
-  whatsapp: '',                 // ej. '34600111222'
-  email: '',                    // ej. 'pedidos@regodoscampos.com'
   tiktokVideos: [],             // enlaces de vídeos para incrustar
   temporada: { Hass: [12, 1, 2, 3, 4, 5], Bacon: [10, 11, 12, 1] }
 };
 ```
 
-- Si se rellena `whatsapp` o `email`, aparecen en la sección de pedidos y en el formulario.
 - Si se añaden enlaces en `tiktokVideos`, la web los incrusta debajo del bloque de TikTok.
 - `temporada` admite cualquier variedad y cualquier lista de meses.
+
+## Añadir o cambiar recetas
+
+Las recetas están en `assets/js/recetas.js`. Cada receta es un bloque con categoría, título, tiempo, raciones, dificultad, variedad, ingredientes, pasos y un consejo. Para añadir una, se copia un bloque, se cambia el `id` y se rellenan los campos. Los filtros, el contador y la ficha se actualizan solos.
+
+Las categorías disponibles son Desayunos, Para picar, Entrantes, Principales y Postres. Si se usa una nueva, aparece sola como filtro.
+Las recetas se publican también como datos estructurados de Google (schema.org Recipe), lo que ayuda a que aparezcan en búsquedas.
 
 ## Verla en local
 
@@ -93,20 +98,18 @@ Para regenerar las imágenes de respaldo del aguacate y la imagen para redes, cu
 Desde el entorno de trabajo no se pudo abrir TikTok ni Instagram, así que estos puntos se redactaron con información general sobre el aguacate gallego y deben revisarse:
 
 1. **Usuario de Instagram.** Está puesto `@regodoscampos`, sin verificar.
-2. **WhatsApp y email de pedidos.** Están vacíos.
 3. **Variedades y meses de cosecha.** El calendario usa Hass y Bacon con fechas orientativas.
-4. **Afirmaciones sobre la forma de trabajar**: recogida a mano, riego solo en verano, plantones injertados y cosecha cercana al pedido.
-5. **Cantidades del formulario**: 2, 5 y 10 kg y hostelería.
-6. **Venta a tiendas y restaurantes**, que aparece en Pedidos y en las preguntas frecuentes.
-7. **Frases del reportaje** que hablan en primera persona: decidir la cosecha mirando el árbol y vender sin intermediarios.
-8. **Fotos reales.** Las tarjetas de la sección Síguenos admiten fotos de fondo de la finca si se quiere.
+4. **Afirmaciones sobre la forma de trabajar**: recogida a mano, riego solo en verano, plantones injertados y cosecha decidida mirando el árbol.
+5. **Recetas**: son propuestas de la web; conviene revisarlas o sustituirlas por las que la finca enseñe en sus vídeos.
+6. **Fotos reales.** Las tarjetas de la sección Síguenos admiten fotos de fondo de la finca si se quiere.
 
 ## Estructura
 
 ```
 index.html              Página
 assets/css/styles.css   Estilos, paleta y tipografías
-assets/js/config.js     Datos editables
+assets/js/config.js     Redes y temporada
+assets/js/recetas.js    Recetario
 assets/js/main.js       Interacción, scroll y animaciones
 assets/js/scene.js      Escena 3D compilada
 src/scene.js            Escena 3D (fuente)
