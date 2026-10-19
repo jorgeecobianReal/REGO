@@ -10,15 +10,23 @@ Web estática de una sola página. Se sube tal cual a cualquier hosting: no nece
 | Hero | Aguacate en 3D real (WebGL) con piel rugosa de Hass, hojas, lluvia y reacción al ratón. Titular editorial con cursiva. |
 | Ábrelo | Al hacer scroll el aguacate se parte en dos mitades y aparecen pulpa, hueso y sus explicaciones. |
 | O nome | Qué significa *rego* en gallego. Un trazo de agua se dibuja al llegar y el texto se ilumina palabra a palabra. |
+| En cifras | Cuatro datos con contador animado: lluvia, meses en el árbol, kilómetros que no recorre y días de maduración. |
 | La finca | Paisaje gallego generado en tiempo real: colinas, hileras de árboles en terrazas, bruma, lluvia y un *rego* que serpentea en primer plano. |
+| Aguacate de aquí | Reportaje con letra capital, cita destacada y ficha lateral fija sobre el aguacate en Galicia. |
 | Proceso | Cinco pasos del árbol a la mesa en recorrido horizontal, con iconos que se dibujan solos. |
+| Variedades | Fichas de Hass y Bacon con fotos de producto renderizadas desde el 3D, que se inclinan con el ratón. |
 | Temporada | Calendario de cosecha por variedad con el mes actual marcado y una frase calculada según el mes ("Ahora mismo es temporada de…" o "La próxima cosecha empieza en…"). |
 | Guía | Control interactivo de madurez y consejos para saber si un aguacate está en su punto. |
+| En la cocina | Tres recetas en pestañas (guacamole, tosta de pan de Cea con sardina, pulpo con aguacate) con ingredientes que se pueden marcar. |
+| Nutrición | Etiqueta nutricional por 100 g con datos de USDA FoodData Central y tres ideas clave. |
+| Pequeno dicionario | Ocho palabras gallegas del campo con su definición y traducción. |
 | Síguenos | Usuario de TikTok a gran tamaño, botones y tres tarjetas con los lemas de la finca. |
 | Pedidos | Formulario que prepara el mensaje del pedido para WhatsApp, email o mensaje directo. En móvil, un botón fijo "Pedir aguacates" acompaña durante el scroll. |
 | Pie | Logotipo grande animado y enlaces. |
 
 El fondo cambia de tono por secciones al hacer scroll: noche, musgo y crema.
+En pantallas grandes, un índice de capítulos fijo a la derecha marca la sección actual y permite saltar a cualquier parte.
+La temporada del calendario, el texto del hero y las fichas de variedades se calculan desde `config.js` y el mes actual.
 
 ## Tecnología
 
@@ -89,7 +97,9 @@ Desde el entorno de trabajo no se pudo abrir TikTok ni Instagram, así que estos
 3. **Variedades y meses de cosecha.** El calendario usa Hass y Bacon con fechas orientativas.
 4. **Afirmaciones sobre la forma de trabajar**: recogida a mano, riego solo en verano, plantones injertados y cosecha cercana al pedido.
 5. **Cantidades del formulario**: 2, 5 y 10 kg y hostelería.
-6. **Fotos reales.** Las tarjetas de la sección Síguenos admiten fotos de fondo de la finca si se quiere.
+6. **Venta a tiendas y restaurantes**, que aparece en Pedidos y en las preguntas frecuentes.
+7. **Frases del reportaje** que hablan en primera persona: decidir la cosecha mirando el árbol y vender sin intermediarios.
+8. **Fotos reales.** Las tarjetas de la sección Síguenos admiten fotos de fondo de la finca si se quiere.
 
 ## Estructura
 

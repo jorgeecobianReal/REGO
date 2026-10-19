@@ -109,14 +109,33 @@
     var head = $('.cal thead th[data-m="' + now + '"]');
     if (head) head.classList.add('is-now');
 
+    // Rango de meses legible por variedad: "De octubre a enero"
+    var rangeText = function (months) {
+      var set = {};
+      months.map(Number).forEach(function (m) { set[m] = true; });
+      var start = null;
+      for (var m = 1; m <= 12; m++) { var prev = m === 1 ? 12 : m - 1; if (set[m] && !set[prev]) { start = m; break; } }
+      if (start === null) return months.length === 12 ? 'Todo el año' : '';
+      var end = start;
+      while (set[end === 12 ? 1 : end + 1] && (end === 12 ? 1 : end + 1) !== start) end = end === 12 ? 1 : end + 1;
+      var txt = start === end ? MONTHS[start - 1] : 'de ' + MONTHS[start - 1] + ' a ' + MONTHS[end - 1];
+      return txt.charAt(0).toUpperCase() + txt.slice(1);
+    };
+    $$('[data-season-of]').forEach(function (el) {
+      var months = data[el.getAttribute('data-season-of')];
+      if (months && months.length) el.textContent = rangeText(months);
+    });
+
     // Frase según el mes actual
     var out = $('[data-season]');
-    if (!out) return;
+    var short = $('[data-season-short]');
+    if (!out && !short) return;
     var names = Object.keys(data);
     var inSeason = names.filter(function (n) { return (data[n] || []).map(Number).indexOf(now) !== -1; });
     var join = function (arr) { return arr.length > 1 ? arr.slice(0, -1).join(', ') + ' y ' + arr[arr.length - 1] : arr[0]; };
     if (inSeason.length) {
-      out.textContent = 'Ahora mismo, en ' + MONTHS[now - 1] + ', es temporada de ' + join(inSeason) + '.';
+      if (out) out.textContent = 'Ahora mismo, en ' + MONTHS[now - 1] + ', es temporada de ' + join(inSeason) + '.';
+      if (short) short.textContent = 'Ahora: temporada de ' + join(inSeason);
     } else {
       var best = null;
       names.forEach(function (n) {
@@ -126,7 +145,8 @@
           else if (best && dist === best.dist && best.names.indexOf(n) === -1) best.names.push(n);
         });
       });
-      out.textContent = best ? 'La próxima cosecha empieza en ' + MONTHS[best.m - 1] + ' con ' + join(best.names) + '.' : '';
+      if (out) out.textContent = best ? 'La próxima cosecha empieza en ' + MONTHS[best.m - 1] + ' con ' + join(best.names) + '.' : '';
+      if (short && best) short.textContent = 'Próxima cosecha: ' + MONTHS[best.m - 1];
     }
   }
 
@@ -248,6 +268,47 @@
         navigator.clipboard.writeText(msg.textContent).then(function () { label.textContent = 'Copiado'; }, selectText);
       } catch (err) { selectText(); }
     });
+  }
+
+  /* ------------------------------------------------------------------
+     4b. Recetas en pestañas
+     ------------------------------------------------------------------ */
+  function initRecipes() {
+    var tabs = $$('.recipes__tab');
+    if (!tabs.length) return;
+    var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); });
+    var refreshTimer = null;
+    var select = function (i, opts) {
+      opts = opts || {};
+      tabs.forEach(function (t, j) {
+        var on = i === j;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        panels[j].hidden = !on;
+      });
+      if (opts.focus) tabs[i].focus();
+      if (opts.animate && window.gsap && !reduce) {
+        gsap.from(panels[i].querySelectorAll('.recipe__head, .recipe__ingredients, .recipe__steps li, .recipe__tip'), {
+          autoAlpha: 0, y: 18, duration: .7, stagger: .04, ease: 'power3.out', clearProps: 'opacity,visibility,transform'
+        });
+      }
+      if (window.ScrollTrigger && opts.animate) {
+        clearTimeout(refreshTimer);
+        refreshTimer = setTimeout(function () { ScrollTrigger.refresh(); }, 120);
+      }
+    };
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { select(i, { animate: true }); });
+      t.addEventListener('keydown', function (e) {
+        var n = null;
+        if (e.key === 'ArrowRight') n = (i + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft') n = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') n = 0;
+        else if (e.key === 'End') n = tabs.length - 1;
+        if (n !== null) { e.preventDefault(); select(n, { animate: true, focus: true }); }
+      });
+    });
+    select(0);
   }
 
   /* ------------------------------------------------------------------
@@ -609,6 +670,7 @@
   buildCalendar();
   initRipeness();
   initForm();
+  initRecipes();
   initMenu();
 
   var loadFallback = function (sel) {
@@ -874,6 +936,28 @@
       gsap.from(g.children, { autoAlpha: 0, y: 30, duration: 1.1, stagger: .1, ease: 'power3.out', scrollTrigger: { trigger: g, start: 'top 88%', once: true } });
     });
 
+    // Contadores de cifras
+    var fmt = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); };
+    $$('[data-count]').forEach(function (el) {
+      var end = Number(el.getAttribute('data-count'));
+      var prefix = el.getAttribute('data-prefix') || '';
+      var o = { v: 0 };
+      el.textContent = prefix + '0';
+      gsap.to(o, {
+        v: end, duration: 2.2, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 90%', once: true },
+        onUpdate: function () { el.textContent = prefix + fmt(Math.round(o.v)); }
+      });
+    });
+
+    // Variedades: el fruto sube con el scroll
+    $$('.variety__fig img').forEach(function (img) {
+      gsap.fromTo(img, { yPercent: 8 }, { yPercent: -8, ease: 'none', scrollTrigger: { trigger: img.closest('.variety'), start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+
+    // Etiqueta nutricional: se endereza al entrar
+    gsap.from('.label', { rotation: -6, y: 60, autoAlpha: 0, duration: 1.4, ease: 'expo.out', scrollTrigger: { trigger: '.label', start: 'top 85%', once: true } });
+
     gsap.fromTo('.cal td.on', { '--grow': 0 }, {
       '--grow': 1, duration: .9, ease: 'power3.inOut', stagger: .045,
       scrollTrigger: { trigger: '.cal', start: 'top 82%', once: true }
@@ -947,7 +1031,37 @@
     }
     gsap.to('.progress span', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: .3 } });
 
+    // Índice de capítulos
+    var chapterLinks = $$('.chapters a');
+    chapterLinks.forEach(function (a) {
+      var sec = document.getElementById(a.getAttribute('data-target'));
+      if (!sec) return;
+      ScrollTrigger.create({
+        trigger: sec, start: 'top 55%', end: 'bottom 55%',
+        onToggle: function (self) {
+          if (!self.isActive) return;
+          chapterLinks.forEach(function (l) { l.classList.toggle('is-active', l === a); l.classList.remove('is-flash'); });
+          a.classList.add('is-flash');
+          clearTimeout(a._flash);
+          a._flash = setTimeout(function () { a.classList.remove('is-flash'); }, 1600);
+        }
+      });
+    });
+
     if (!finePointer || reduce) return;
+
+    $$('.variety').forEach(function (card) {
+      var img = $('.variety__fig img', card);
+      if (!img) return;
+      var rot = gsap.quickTo(img, 'rotation', { duration: .9, ease: 'power3' });
+      var lift = gsap.quickTo(img, 'y', { duration: .9, ease: 'power3' });
+      card.addEventListener('pointermove', function (e) {
+        var r = card.getBoundingClientRect();
+        rot(((e.clientX - r.left) / r.width - .5) * 10);
+        lift(-14);
+      });
+      card.addEventListener('pointerleave', function () { rot(0); lift(0); });
+    });
 
     html.classList.add('has-cursor');
     var cursor = $('.cursor');

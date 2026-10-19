@@ -78,25 +78,36 @@ function makeCanvas(w, h) {
 }
 
 /* ---------- texturas ---------- */
-function skinTextures() {
+const SKINS = {
+  // Hass: piel gruesa, granulada y oscura
+  hass: { base: [0x2c, 0x42, 0x22], grain: 0.55, grainTone: 0.22, rough: 0.62, speckle: 0 },
+  // Bacon: piel fina, lisa, verde vivo con lenticelas claras
+  bacon: { base: [0x4a, 0x76, 0x2c], grain: 0.1, grainTone: 0.05, rough: 0.42, speckle: 0.006 }
+};
+
+function skinTextures(kind) {
+  const P = SKINS[kind] || SKINS.hass;
   const W = 1024, H = 512;
   const cells = cellNoise(W, H, 110, 55, 11);
   const low = valueNoise(W, H, 6, 3, 23);
   const mid = valueNoise(W, H, 24, 12, 31);
+  const rand = mulberry(77);
   const map = makeCanvas(W, H), bump = makeCanvas(W, H), rough = makeCanvas(W, H);
   const mi = map.getContext('2d').createImageData(W, H);
   const bi = bump.getContext('2d').createImageData(W, H);
   const ri = rough.getContext('2d').createImageData(W, H);
-  const base = [0x2c, 0x42, 0x22];
+  const base = P.base;
   for (let i = 0; i < W * H; i++) {
     const c = clamp01(1 - cells[i] * 1.9);       // 1 en el centro de cada grano
-    const bumpV = c * 0.55 + mid[i] * 0.3 + low[i] * 0.15;
-    const tone = 0.72 + low[i] * 0.45 + (c - 0.5) * 0.22 + (mid[i] - 0.5) * 0.12;
+    const bumpV = c * P.grain + mid[i] * 0.3 + low[i] * 0.15;
+    let tone = 0.72 + low[i] * 0.45 + (c - 0.5) * P.grainTone + (mid[i] - 0.5) * 0.12;
     const o = i * 4;
-    mi.data[o] = base[0] * tone; mi.data[o + 1] = base[1] * tone; mi.data[o + 2] = base[2] * tone; mi.data[o + 3] = 255;
+    let r0 = base[0] * tone, g0 = base[1] * tone, b0 = base[2] * tone;
+    if (P.speckle && rand() < P.speckle) { r0 = 0xc8; g0 = 0xcf; b0 = 0x8a; }
+    mi.data[o] = r0; mi.data[o + 1] = g0; mi.data[o + 2] = b0; mi.data[o + 3] = 255;
     const b = bumpV * 255;
     bi.data[o] = bi.data[o + 1] = bi.data[o + 2] = b; bi.data[o + 3] = 255;
-    const r = (0.62 - c * 0.18 + (1 - low[i]) * 0.1) * 255;
+    const r = (P.rough - c * 0.18 * (P.grain / 0.55) + (1 - low[i]) * 0.1) * 255;
     ri.data[o] = ri.data[o + 1] = ri.data[o + 2] = r; ri.data[o + 3] = 255;
   }
   map.getContext('2d').putImageData(mi, 0, 0);
@@ -317,7 +328,8 @@ export function createAvocadoScene(canvas) {
   scene.add(new THREE.AmbientLight(0x30402a, 0.5));
 
   /* Materiales */
-  const skin = skinTextures();
+  const skins = { hass: skinTextures('hass') };
+  const skin = skins.hass;
   const skinMat = new THREE.MeshPhysicalMaterial({
     map: skin.map, bumpMap: skin.bump, bumpScale: 0.9, roughnessMap: skin.rough,
     roughness: 1, metalness: 0, envMapIntensity: 0.9,
@@ -537,6 +549,16 @@ export function createAvocadoScene(canvas) {
     setCentered(v) { state.centered = !!v; layout(); },
     setRain(v) { rain.visible = !!v; },
     setPose(y) { spin.rotation.y = y; state.poseY = y; },
+    setVariety(kind) {
+      if (!SKINS[kind]) return;
+      if (!skins[kind]) skins[kind] = skinTextures(kind);
+      const t = skins[kind];
+      skinMat.map = t.map; skinMat.bumpMap = t.bump; skinMat.roughnessMap = t.rough;
+      skinMat.bumpScale = kind === 'bacon' ? 0.3 : 0.9;
+      skinMat.clearcoat = kind === 'bacon' ? 0.45 : 0.22;
+      skinMat.needsUpdate = true;
+      renderFrame(0);
+    },
     resize,
     render() { state.progress = state.target; renderFrame(0); },
     dispose() { api.stop(); renderer.dispose(); }

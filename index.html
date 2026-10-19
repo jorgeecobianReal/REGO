@@ -88,6 +88,24 @@
 <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
 <div class="progress" aria-hidden="true"><span></span></div>
 
+<nav class="chapters" aria-label="Capítulos de la página">
+  <ol>
+    <li><a href="#top" data-target="top"><span class="chapters__t">Inicio</span></a></li>
+    <li><a href="#cifras" data-target="cifras"><span class="chapters__t">En cifras</span></a></li>
+    <li><a href="#finca" data-target="finca"><span class="chapters__t">La finca</span></a></li>
+    <li><a href="#aguacate-gallego" data-target="aguacate-gallego"><span class="chapters__t">Aguacate de aquí</span></a></li>
+    <li><a href="#proceso" data-target="proceso"><span class="chapters__t">Proceso</span></a></li>
+    <li><a href="#variedades" data-target="variedades"><span class="chapters__t">Variedades</span></a></li>
+    <li><a href="#temporada" data-target="temporada"><span class="chapters__t">Temporada</span></a></li>
+    <li><a href="#guia" data-target="guia"><span class="chapters__t">Guía</span></a></li>
+    <li><a href="#cocina" data-target="cocina"><span class="chapters__t">En la cocina</span></a></li>
+    <li><a href="#nutricion" data-target="nutricion"><span class="chapters__t">Nutrición</span></a></li>
+    <li><a href="#dicionario" data-target="dicionario"><span class="chapters__t">Dicionario</span></a></li>
+    <li><a href="#tiktok" data-target="tiktok"><span class="chapters__t">Síguenos</span></a></li>
+    <li><a href="#pedidos" data-target="pedidos"><span class="chapters__t">Pedidos</span></a></li>
+  </ol>
+</nav>
+
 <header class="site-header">
   <div class="wrap site-header__inner">
     <a class="brand" href="#top" aria-label="Rego dos Campos, ir al inicio">
@@ -97,9 +115,9 @@
     <nav class="nav" aria-label="Principal">
       <ul>
         <li><a href="#finca">La finca</a></li>
-        <li><a href="#proceso">Proceso</a></li>
+        <li><a href="#variedades">Variedades</a></li>
         <li><a href="#temporada">Temporada</a></li>
-        <li><a href="#guia">Guía</a></li>
+        <li><a href="#cocina">Recetas</a></li>
         <li><a href="#tiktok">TikTok</a></li>
       </ul>
     </nav>
@@ -115,9 +133,10 @@
   <nav aria-label="Menú móvil">
     <ul>
       <li><a href="#finca">La finca</a></li>
-      <li><a href="#proceso">Proceso</a></li>
+      <li><a href="#aguacate-gallego">Aguacate de aquí</a></li>
+      <li><a href="#variedades">Variedades</a></li>
       <li><a href="#temporada">Temporada</a></li>
-      <li><a href="#guia">Guía</a></li>
+      <li><a href="#cocina">Recetas</a></li>
       <li><a href="#pedidos">Pedidos</a></li>
     </ul>
   </nav>
@@ -172,7 +191,7 @@
 
       <div class="wrap scene__foot" aria-hidden="true">
         <span class="scroll-cue"><i></i>Desliza para abrirlo</span>
-        <span class="mono">Feito en Galicia</span>
+        <span class="mono" data-season-short>Feito en Galicia</span>
       </div>
     </div>
   </section>
@@ -229,6 +248,38 @@
     </div>
   </section>
 
+  <!-- ============ EN CIFRAS ============ -->
+  <section class="cifras" id="cifras" data-tone="night">
+    <div class="wrap">
+      <div class="cifras__head">
+        <p class="eyebrow">En cifras</p>
+        <h2 class="h2" data-split>Lo que hay detrás <em>de cada aguacate.</em></h2>
+      </div>
+      <ul class="stats" data-reveal-group>
+        <li class="stat">
+          <p class="stat__num"><span data-count="1800">1.800</span><small>mm</small></p>
+          <p class="stat__label mono">Lluvia al año</p>
+          <p class="stat__text">Es lo que puede llegar a llover en un año en la costa atlántica gallega. Aquí el agua llega sola, del cielo, y el riego queda para los veranos secos.</p>
+        </li>
+        <li class="stat">
+          <p class="stat__num"><span data-count="12">12</span><small>meses</small></p>
+          <p class="stat__label mono">De la flor al fruto</p>
+          <p class="stat__text">Un Hass puede pasar más de un año colgado del árbol desde que florece hasta que está listo. Es un fruto lento, y eso se nota en la pulpa.</p>
+        </li>
+        <li class="stat">
+          <p class="stat__num"><span data-count="9000">9.000</span><small>km</small></p>
+          <p class="stat__label mono">Los que no recorre</p>
+          <p class="stat__text">Más de nueve mil kilómetros separan Galicia de Perú, uno de los grandes proveedores de aguacate de Europa. Un aguacate de aquí se ahorra el viaje.</p>
+        </li>
+        <li class="stat">
+          <p class="stat__num"><span data-count="7" data-prefix="4–">4–7</span><small>días</small></p>
+          <p class="stat__label mono">En tu cocina</p>
+          <p class="stat__text">Es lo que suele tardar en madurar a temperatura ambiente desde que llega firme. Sin prisas, sin cámaras y sin golpes por el camino.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
   <!-- ============ LA FINCA ============ -->
   <section class="finca" id="finca" data-tone="moss">
     <canvas class="finca__land" aria-hidden="true"></canvas>
@@ -252,6 +303,41 @@
           <dd>Poda, desbroce y cosecha se hacen a mano, árbol por árbol.</dd>
         </div>
       </dl>
+    </div>
+  </section>
+
+  <!-- ============ AGUACATE DE AQUÍ (reportaje) ============ -->
+  <section class="longread" id="aguacate-gallego" data-tone="cream">
+    <div class="wrap">
+      <header class="longread__head">
+        <p class="eyebrow">Aguacate de aquí</p>
+        <h2 class="h2" data-split>Un aguacate que <em>no cruza el océano.</em></h2>
+      </header>
+      <div class="longread__grid">
+        <div class="longread__body">
+          <p class="dropcap" data-reveal>Muchos de los aguacates que se comen en España llegan de muy lejos. Viajan en barco desde Perú, Chile o México, se recogen verdes para aguantar semanas de trayecto y pasan por cámaras frigoríficas antes de llegar a la frutería. Cuando por fin se abren en casa, han pasado más tiempo en un contenedor que en el árbol.</p>
+          <p data-reveal>En Galicia el aguacate es un cultivo joven. Durante años pareció una idea imposible: el árbol teme las heladas y aquí el invierno es frío. Pero en la franja costera, donde el mar templa las noches, un puñado de productores empezó a plantar y descubrió que el aguacate no solo sobrevivía. Daba fruta con carácter propio.</p>
+          <blockquote class="pull" data-reveal>
+            <p>Cada aguacate que no cruza el océano es un aguacate que se recoge cuando toca.</p>
+          </blockquote>
+          <p data-reveal>El clima atlántico marca el ritmo. Sin golpes de calor y con temperaturas suaves, el fruto crece despacio y pasa mucho tiempo colgado. Mientras está en el árbol no se ablanda: va acumulando aceite y sabor. Por eso el momento de la cosecha importa tanto, y por eso nos gusta decidirlo nosotros, mirando el árbol, en lugar de un calendario de exportación.</p>
+          <p data-reveal>Y está el agua. En otras zonas productoras el riego es el gran debate del aguacate. En la costa gallega la lluvia hace la mayor parte del trabajo y el árbol bebe lo que le da el cielo. Es una de las razones por las que el aguacate tiene sentido aquí.</p>
+          <p data-reveal>Por todo eso lo llamamos aguacate de aquí: cultivado cerca, recogido en su momento y vendido a quien vive al lado. Sin intermediarios que lo retengan, sin viajes que lo cansen.</p>
+        </div>
+        <aside class="longread__aside" aria-label="El aguacate en Galicia">
+          <div class="factbox" data-reveal>
+            <img class="factbox__img" src="assets/img/avocado-open.webp" alt="Aguacate abierto con su hueso" loading="lazy" decoding="async" width="1100" height="1100">
+            <p class="factbox__title">El aguacate en Galicia</p>
+            <dl class="factbox__list">
+              <div><dt>Zona</dt><dd>Franja costera atlántica, sobre todo en las Rías Baixas</dd></div>
+              <div><dt>Variedades</dt><dd>Hass y Bacon, las más plantadas</dd></div>
+              <div><dt>Cosecha</dt><dd>De otoño a primavera, según la variedad</dd></div>
+              <div><dt>Riego</dt><dd>La lluvia atlántica y apoyo en verano</dd></div>
+              <div><dt>Enemigo</dt><dd>Las heladas, por eso se planta cerca del mar</dd></div>
+            </dl>
+          </div>
+        </aside>
+      </div>
     </div>
   </section>
 
@@ -298,6 +384,56 @@
     </div>
   </section>
 
+  <!-- ============ VARIEDADES ============ -->
+  <section class="variedades" id="variedades" data-tone="moss">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Variedades</p>
+        <h2 class="h2" data-split>Dos aguacates, <em>dos caracteres.</em></h2>
+        <p class="lead" data-reveal>En Galicia se plantan sobre todo dos variedades. Por fuera se parecen; al abrirlas, cada una cuenta algo distinto.</p>
+      </div>
+      <div class="varieties">
+        <article class="variety" data-reveal>
+          <figure class="variety__fig">
+            <span class="variety__glow" aria-hidden="true"></span>
+            <img src="assets/img/variety-hass.webp" alt="Aguacate Hass de piel rugosa y verde oscuro" loading="lazy" decoding="async" width="900" height="900">
+          </figure>
+          <div class="variety__body">
+            <p class="variety__kicker mono">La más cultivada del mundo</p>
+            <h3 class="variety__name">Hass</h3>
+            <p class="variety__desc">Nació en California en los años veinte y hoy es el aguacate de referencia. Piel gruesa y rugosa que pasa del verde al casi negro cuando madura, y una pulpa densa, muy cremosa, con un sabor intenso que recuerda a la avellana.</p>
+            <dl class="spec">
+              <div><dt>Piel</dt><dd>Rugosa, se oscurece al madurar</dd></div>
+              <div><dt>Pulpa</dt><dd>Muy cremosa, rica en aceite</dd></div>
+              <div><dt>Sabor</dt><dd>Intenso, a fruto seco</dd></div>
+              <div><dt>Ideal para</dt><dd>Guacamole, tostas, untar</dd></div>
+              <div><dt>Temporada</dt><dd data-season-of="Hass">Invierno y primavera</dd></div>
+            </dl>
+          </div>
+        </article>
+        <article class="variety" data-reveal>
+          <figure class="variety__fig">
+            <span class="variety__glow" aria-hidden="true"></span>
+            <img src="assets/img/variety-bacon.webp" alt="Aguacate Bacon de piel lisa y verde brillante" loading="lazy" decoding="async" width="900" height="900">
+          </figure>
+          <div class="variety__body">
+            <p class="variety__kicker mono">La que aguanta el frío</p>
+            <h3 class="variety__name">Bacon</h3>
+            <p class="variety__desc">También californiana, es de las variedades que mejor soportan el frío, y por eso se da bien en Galicia. Piel fina y lisa que sigue verde aunque esté madura, y una pulpa más ligera y jugosa, de sabor suave y fresco.</p>
+            <dl class="spec">
+              <div><dt>Piel</dt><dd>Fina y lisa, siempre verde</dd></div>
+              <div><dt>Pulpa</dt><dd>Ligera y jugosa</dd></div>
+              <div><dt>Sabor</dt><dd>Suave, fresco</dd></div>
+              <div><dt>Ideal para</dt><dd>Ensaladas, dados, cremas frías</dd></div>
+              <div><dt>Temporada</dt><dd data-season-of="Bacon">Otoño e invierno</dd></div>
+            </dl>
+          </div>
+        </article>
+      </div>
+      <p class="variedades__note mono">Truco: si es Bacon, no esperes a que se oscurezca. Fíate del tacto.</p>
+    </div>
+  </section>
+
   <!-- ============ TEMPORADA ============ -->
   <section class="temporada" id="temporada" data-tone="cream">
     <div class="wrap">
@@ -335,7 +471,7 @@
   </section>
 
   <!-- ============ GUÍA ============ -->
-  <section class="guia" id="guia" data-tone="moss">
+  <section class="guia" id="guia" data-tone="night">
     <div class="wrap">
       <div class="section-head">
         <p class="eyebrow">Guía</p>
@@ -379,6 +515,182 @@
         </ul>
       </div>
       <p class="guia__note mono">En el Hass la piel se oscurece al madurar. En el Bacon apenas cambia de color: fíate del tacto.</p>
+    </div>
+  </section>
+
+  <!-- ============ EN LA COCINA ============ -->
+  <section class="cocina" id="cocina" data-tone="cream">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">En la cocina</p>
+        <h2 class="h2" data-split>Tres recetas <em>para empezar.</em></h2>
+        <p class="lead" data-reveal>Un clásico, una tosta con sabor a costa y una ensalada que junta el aguacate con el pulpo. Marca los ingredientes que ya tienes.</p>
+      </div>
+
+      <div class="recipes" data-reveal>
+        <div class="recipes__tabs" role="tablist" aria-label="Recetas">
+          <button class="recipes__tab" role="tab" id="tab-guaca" aria-controls="rec-guaca" aria-selected="true" type="button"><span class="mono">01</span>Guacamole de la finca</button>
+          <button class="recipes__tab" role="tab" id="tab-tosta" aria-controls="rec-tosta" aria-selected="false" tabindex="-1" type="button"><span class="mono">02</span>Tosta de pan de Cea</button>
+          <button class="recipes__tab" role="tab" id="tab-pulpo" aria-controls="rec-pulpo" aria-selected="false" tabindex="-1" type="button"><span class="mono">03</span>Pulpo con aguacate</button>
+        </div>
+
+        <article class="recipe" role="tabpanel" id="rec-guaca" aria-labelledby="tab-guaca">
+          <header class="recipe__head">
+            <h3 class="recipe__title">Guacamole <em>de la finca</em></h3>
+            <dl class="recipe__meta">
+              <div><dt>Tiempo</dt><dd>10 min</dd></div>
+              <div><dt>Raciones</dt><dd>4</dd></div>
+              <div><dt>Dificultad</dt><dd>Fácil</dd></div>
+              <div><dt>Variedad</dt><dd>Hass</dd></div>
+            </dl>
+          </header>
+          <div class="recipe__grid">
+            <div class="recipe__ingredients">
+              <h4 class="mono">Ingredientes</h4>
+              <ul>
+                <li><label><input type="checkbox" id="g-1"><span>3 aguacates maduros</span></label></li>
+                <li><label><input type="checkbox" id="g-2"><span>1 lima</span></label></li>
+                <li><label><input type="checkbox" id="g-3"><span>½ cebolleta</span></label></li>
+                <li><label><input type="checkbox" id="g-4"><span>1 tomate maduro</span></label></li>
+                <li><label><input type="checkbox" id="g-5"><span>Un puñado de cilantro</span></label></li>
+                <li><label><input type="checkbox" id="g-6"><span>Sal en escamas</span></label></li>
+                <li><label><input type="checkbox" id="g-7"><span>Guindilla, si te gusta el picante</span></label></li>
+              </ul>
+            </div>
+            <ol class="recipe__steps">
+              <li>Abre los aguacates, retira el hueso y saca la pulpa con una cuchara a un bol.</li>
+              <li>Aplástala con un tenedor. Deja algún trozo: un buen guacamole tiene textura.</li>
+              <li>Añade enseguida el zumo de la lima y la sal, para que no se oxide.</li>
+              <li>Pica fino la cebolleta, el tomate sin semillas y el cilantro.</li>
+              <li>Mézclalo todo, prueba y ajusta de sal, lima o guindilla.</li>
+            </ol>
+          </div>
+          <p class="recipe__tip"><span class="mono">Consejo</span> Si sobra, tápalo con film pegado a la superficie. El aire es lo que lo oscurece.</p>
+        </article>
+
+        <article class="recipe" role="tabpanel" id="rec-tosta" aria-labelledby="tab-tosta">
+          <header class="recipe__head">
+            <h3 class="recipe__title">Tosta de pan de Cea <em>con sardina</em></h3>
+            <dl class="recipe__meta">
+              <div><dt>Tiempo</dt><dd>15 min</dd></div>
+              <div><dt>Raciones</dt><dd>4</dd></div>
+              <div><dt>Dificultad</dt><dd>Fácil</dd></div>
+              <div><dt>Variedad</dt><dd>Hass</dd></div>
+            </dl>
+          </header>
+          <div class="recipe__grid">
+            <div class="recipe__ingredients">
+              <h4 class="mono">Ingredientes</h4>
+              <ul>
+                <li><label><input type="checkbox" id="t-1"><span>4 rebanadas de pan de Cea</span></label></li>
+                <li><label><input type="checkbox" id="t-2"><span>2 aguacates maduros</span></label></li>
+                <li><label><input type="checkbox" id="t-3"><span>1 lata de sardinas en aceite</span></label></li>
+                <li><label><input type="checkbox" id="t-4"><span>½ limón</span></label></li>
+                <li><label><input type="checkbox" id="t-5"><span>Aceite de oliva virgen extra</span></label></li>
+                <li><label><input type="checkbox" id="t-6"><span>Pimentón de la Vera</span></label></li>
+                <li><label><input type="checkbox" id="t-7"><span>Sal en escamas y cebollino</span></label></li>
+              </ul>
+            </div>
+            <ol class="recipe__steps">
+              <li>Tuesta las rebanadas de pan en una sartén o plancha con un hilo de aceite.</li>
+              <li>Aplasta el aguacate con el zumo de limón y una pizca de sal.</li>
+              <li>Reparte el aguacate sobre el pan, sin miedo: es la base de todo.</li>
+              <li>Coloca encima las sardinas en lomos, escurridas.</li>
+              <li>Termina con pimentón, cebollino picado, escamas de sal y un poco de aceite.</li>
+            </ol>
+          </div>
+          <p class="recipe__tip"><span class="mono">Consejo</span> En temporada de sardina, ásala a la brasa y quítale la espina. Cambia la tosta por completo.</p>
+        </article>
+
+        <article class="recipe" role="tabpanel" id="rec-pulpo" aria-labelledby="tab-pulpo">
+          <header class="recipe__head">
+            <h3 class="recipe__title">Pulpo <em>con aguacate</em></h3>
+            <dl class="recipe__meta">
+              <div><dt>Tiempo</dt><dd>20 min</dd></div>
+              <div><dt>Raciones</dt><dd>4</dd></div>
+              <div><dt>Dificultad</dt><dd>Media</dd></div>
+              <div><dt>Variedad</dt><dd>Bacon</dd></div>
+            </dl>
+          </header>
+          <div class="recipe__grid">
+            <div class="recipe__ingredients">
+              <h4 class="mono">Ingredientes</h4>
+              <ul>
+                <li><label><input type="checkbox" id="p-1"><span>400 g de pulpo cocido</span></label></li>
+                <li><label><input type="checkbox" id="p-2"><span>2 aguacates</span></label></li>
+                <li><label><input type="checkbox" id="p-3"><span>2 patatas cocidas</span></label></li>
+                <li><label><input type="checkbox" id="p-4"><span>½ cebolla morada</span></label></li>
+                <li><label><input type="checkbox" id="p-5"><span>1 limón</span></label></li>
+                <li><label><input type="checkbox" id="p-6"><span>Aceite de oliva y pimentón</span></label></li>
+                <li><label><input type="checkbox" id="p-7"><span>Sal gruesa</span></label></li>
+              </ul>
+            </div>
+            <ol class="recipe__steps">
+              <li>Corta las patatas en rodajas gruesas y el pulpo en trozos, como para servir á feira.</li>
+              <li>Pica la cebolla morada muy fina y déjala diez minutos en agua fría con limón.</li>
+              <li>Corta el aguacate en dados y alíñalo con limón, aceite y sal.</li>
+              <li>Monta en un plato: patata, pulpo, aguacate y la cebolla escurrida.</li>
+              <li>Acaba con sal gruesa, pimentón y un buen chorro de aceite.</li>
+            </ol>
+          </div>
+          <p class="recipe__tip"><span class="mono">Consejo</span> Sirve el pulpo templado y el aguacate frío. El contraste es lo que hace el plato.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NUTRICIÓN ============ -->
+  <section class="nutri" id="nutricion" data-tone="moss">
+    <div class="wrap nutri__grid">
+      <div class="nutri__copy">
+        <p class="eyebrow">Nutrición</p>
+        <h2 class="h2" data-split>Grasa buena, <em>fibra y potasio.</em></h2>
+        <p class="lead" data-reveal>El aguacate es una fruta rara: casi no tiene azúcar y casi todo su aporte viene de la grasa. Y es una grasa de las buenas.</p>
+        <ul class="nutri__facts" data-reveal-group>
+          <li><strong>Como el aceite de oliva.</strong> La mayor parte de su grasa es monoinsaturada, de la misma familia que la del aceite de oliva.</li>
+          <li><strong>Más potasio que un plátano.</strong> Por cada 100 gramos aporta más potasio que el plátano, la fruta que todos asociamos a este mineral.</li>
+          <li><strong>Mucha fibra.</strong> Con unos 7 gramos por cada 100, es de las frutas frescas con más fibra.</li>
+        </ul>
+      </div>
+      <figure class="label" data-reveal>
+        <figcaption class="label__title">Información nutricional</figcaption>
+        <p class="label__sub">Por cada 100 g de pulpa</p>
+        <dl class="label__rows">
+          <div class="label__row label__row--big"><dt>Energía</dt><dd>160 kcal</dd></div>
+          <div class="label__row"><dt>Grasas</dt><dd>14,7 g</dd></div>
+          <div class="label__row label__row--sub"><dt>de las cuales monoinsaturadas</dt><dd>9,8 g</dd></div>
+          <div class="label__row"><dt>Hidratos de carbono</dt><dd>8,5 g</dd></div>
+          <div class="label__row label__row--sub"><dt>de los cuales azúcares</dt><dd>0,7 g</dd></div>
+          <div class="label__row"><dt>Fibra</dt><dd>6,7 g</dd></div>
+          <div class="label__row"><dt>Proteínas</dt><dd>2 g</dd></div>
+          <div class="label__row label__row--rule"><dt>Potasio</dt><dd>485 mg</dd></div>
+          <div class="label__row"><dt>Folato</dt><dd>81 µg</dd></div>
+          <div class="label__row"><dt>Vitamina K</dt><dd>21 µg</dd></div>
+          <div class="label__row"><dt>Vitamina E</dt><dd>2,1 mg</dd></div>
+        </dl>
+        <p class="label__src">Aguacate crudo, variedades comerciales. Fuente: USDA FoodData Central. Valores orientativos.</p>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ PEQUENO DICIONARIO ============ -->
+  <section class="dicionario" id="dicionario" data-tone="cream">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Pequeno dicionario</p>
+        <h2 class="h2" data-split>Palabras <em>da finca.</em></h2>
+        <p class="lead" data-reveal>Ocho palabras gallegas que se oyen entre los árboles. Algunas no tienen traducción exacta.</p>
+      </div>
+      <dl class="words" data-reveal-group>
+        <div class="word"><dt>rego</dt><dd><span class="word__gl">Pequeno curso de auga.</span><span class="word__es mono">Arroyo, surco de riego</span></dd></div>
+        <div class="word"><dt>brétema</dt><dd><span class="word__gl">Néboa mesta.</span><span class="word__es mono">Niebla</span></dd></div>
+        <div class="word"><dt>orballo</dt><dd><span class="word__gl">Chuvia moi miúda.</span><span class="word__es mono">Llovizna, rocío</span></dd></div>
+        <div class="word"><dt>choiva</dt><dd><span class="word__gl">Auga que cae das nubes.</span><span class="word__es mono">Lluvia</span></dd></div>
+        <div class="word"><dt>leira</dt><dd><span class="word__gl">Terreo de cultivo.</span><span class="word__es mono">Parcela, finca</span></dd></div>
+        <div class="word"><dt>enxerto</dt><dd><span class="word__gl">Parte dunha planta unida a outra para que medre con ela.</span><span class="word__es mono">Injerto</span></dd></div>
+        <div class="word"><dt>colleita</dt><dd><span class="word__gl">Acción de recoller os froitos.</span><span class="word__es mono">Cosecha</span></dd></div>
+        <div class="word"><dt>sachar</dt><dd><span class="word__gl">Remover a terra co sacho.</span><span class="word__es mono">Escardar, cavar</span></dd></div>
+      </dl>
     </div>
   </section>
 
@@ -502,6 +814,22 @@
         <summary>¿Cómo los conservo?</summary>
         <p>Hasta que maduren, fuera de la nevera. Cuando cedan al tacto, a la nevera: así aguantan unos días más.</p>
       </details>
+      <details>
+        <summary>¿Qué diferencia hay entre Hass y Bacon?</summary>
+        <p>El Hass tiene la piel rugosa, se oscurece al madurar y su pulpa es muy cremosa. El Bacon tiene la piel fina, sigue verde cuando está maduro y su sabor es más suave. Lo tienes explicado en <a href="#variedades">variedades</a>.</p>
+      </details>
+      <details>
+        <summary>¿Se puede congelar el aguacate?</summary>
+        <p>Sí, mejor en puré con unas gotas de limón y en un recipiente cerrado. Aguanta varios meses y sirve para guacamole, cremas o batidos. Para comerlo en láminas, mejor fresco.</p>
+      </details>
+      <details>
+        <summary>¿Por qué a veces tiene hebras oscuras?</summary>
+        <p>Son los conductos que llevaban agua y nutrientes al fruto. En algunos aguacates se ven más que en otros y se pueden comer sin problema. Si molestan, se retiran con la punta de una cuchara.</p>
+      </details>
+      <details>
+        <summary>¿Vendéis a tiendas y restaurantes?</summary>
+        <p>Sí. Escríbenos con una idea del volumen y de cada cuánto lo necesitas, y te preparamos una propuesta para la temporada.</p>
+      </details>
     </div>
   </section>
 
@@ -512,14 +840,19 @@
 <footer class="footer" data-tone="night">
   <div class="wrap">
     <div class="footer__top">
-      <p class="footer__claim">Feito en Galicia, <em>con choiva e paciencia.</em></p>
+      <div class="footer__about">
+        <p class="footer__claim">Feito en Galicia, <em>con choiva e paciencia.</em></p>
+        <p class="footer__text">Rego dos Campos es una finca de aguacates en Galicia. Cultivamos al ritmo del clima atlántico, recogemos a mano y vendemos directamente, sin intermediarios. Si quieres probarlos, escríbenos.</p>
+      </div>
       <div class="footer__cols">
         <nav aria-label="Pie de página">
           <p class="mono">Navegación</p>
           <ul>
             <li><a href="#finca">La finca</a></li>
-            <li><a href="#proceso">Proceso</a></li>
+            <li><a href="#aguacate-gallego">Aguacate de aquí</a></li>
+            <li><a href="#variedades">Variedades</a></li>
             <li><a href="#temporada">Temporada</a></li>
+            <li><a href="#cocina">Recetas</a></li>
             <li><a href="#pedidos">Pedidos</a></li>
           </ul>
         </nav>
