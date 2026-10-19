@@ -930,10 +930,10 @@
     }
 
     $$('[data-reveal]').forEach(function (el) {
-      gsap.from(el, { autoAlpha: 0, y: 36, duration: 1.2, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+      gsap.from(el, { autoAlpha: 0, y: 36, duration: 1.2, ease: 'power3.out', clearProps: 'transform', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
     });
     $$('[data-reveal-group]').forEach(function (g) {
-      gsap.from(g.children, { autoAlpha: 0, y: 30, duration: 1.1, stagger: .1, ease: 'power3.out', scrollTrigger: { trigger: g, start: 'top 88%', once: true } });
+      gsap.from(g.children, { autoAlpha: 0, y: 30, duration: 1.1, stagger: .1, ease: 'power3.out', clearProps: 'transform', scrollTrigger: { trigger: g, start: 'top 88%', once: true } });
     });
 
     // Contadores de cifras

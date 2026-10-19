@@ -1276,6 +1276,7 @@ html.reduced-motion .scroll-cue i::after { animation: none; }
   width: calc(100% + 3rem);
   max-width: none;
   margin-inline: -1.5rem;
+  height: auto;
   aspect-ratio: 16 / 10;
   object-fit: cover;
   object-position: 50% 52%;
@@ -1331,11 +1332,12 @@ html.reduced-motion .scroll-cue i::after { animation: none; }
   background: radial-gradient(closest-side, rgba(217, 222, 126, .28), transparent 72%);
 }
 .variety__fig img {
-  position: relative;
+  position: absolute;
+  inset: 0;
   width: auto;
-  height: 112%;
+  height: 104%;
   max-width: none;
-  will-change: transform;
+  margin: auto;
 }
 .variety__body { display: grid; align-content: start; gap: 1rem; padding: clamp(1.5rem, 3vw, 2.5rem); }
 .variety__kicker { color: var(--accent); }
