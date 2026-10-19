@@ -801,7 +801,12 @@
       .to(count, { v: 100, duration: 1.4, ease: 'power2.inOut', onUpdate: function () { counter.textContent = Math.round(count.v); } }, 0);
   }
 
-  Promise.all([fontsReady, loaderTl ? loaderTl.then() : null]).then(init);
+  // La intro espera al aguacate 3D real, como mucho unos segundos
+  var sceneReady = Promise.race([
+    scene3d && scene3d.ready ? scene3d.ready : Promise.resolve(),
+    new Promise(function (r) { setTimeout(r, 4000); })
+  ]);
+  Promise.all([fontsReady, sceneReady, loaderTl ? loaderTl.then() : null]).then(init);
 
   /* ---------- Intro del hero ---------- */
   function heroIntro() {
@@ -1051,13 +1056,15 @@
     header.addEventListener('focusin', function () { header.classList.remove('is-hidden'); });
     var cta = $('.sticky-cta');
     var recetario = $('#cocina');
+    var sceneEl = $('.scene');
     if (cta && recetario) {
       ScrollTrigger.create({
         start: 0, end: 'max',
         onUpdate: function (self) {
           var y = self.scroll();
           var limit = recetario.getBoundingClientRect().top + y - window.innerHeight * .6;
-          cta.classList.toggle('is-visible', y > window.innerHeight * 1.2 && y < limit && !html.classList.contains('menu-open'));
+          var afterScene = sceneEl ? sceneEl.offsetTop + sceneEl.offsetHeight - window.innerHeight * .5 : window.innerHeight * 1.2;
+          cta.classList.toggle('is-visible', y > afterScene && y < limit && !html.classList.contains('menu-open'));
         }
       });
     }

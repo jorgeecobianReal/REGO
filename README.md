@@ -8,8 +8,8 @@ Web estática de una sola página. Se sube tal cual a cualquier hosting: no nece
 
 | Sección | Qué hace |
 |---|---|
-| Hero | Aguacate en 3D real (WebGL) con piel rugosa de Hass, hojas, lluvia y reacción al ratón. Titular editorial con cursiva. |
-| Ábrelo | Al hacer scroll el aguacate se parte en dos mitades y aparecen pulpa, hueso y sus explicaciones. |
+| Hero | Aguacate 3D real (modelo GLB hiperrealista) con hojas, lluvia y reacción al ratón. Titular editorial con cursiva. |
+| Ábrelo | Al hacer scroll el aguacate entero se funde con el modelo partido: las dos mitades reales giran y se abren hasta mostrar el hueso y el hueco con sus fibras. |
 | O nome | Qué significa *rego* en gallego. Un trazo de agua se dibuja al llegar y el texto se ilumina palabra a palabra. |
 | En cifras | Cuatro datos con contador animado: lluvia, meses en el árbol, kilómetros que no recorre y días de maduración. |
 | La finca | Paisaje gallego generado en tiempo real: colinas, hileras de árboles en terrazas, bruma, lluvia y un *rego* que serpentea en primer plano. |
@@ -33,16 +33,36 @@ La temporada del calendario, el texto del hero y las fichas de variedades se cal
 
 | Pieza | Uso |
 |---|---|
-| [three.js 0.186](https://threejs.org) | Aguacate 3D generado por código: geometría por revolución, piel con relieve procedural, pulpa, hueso, hojas y lluvia |
+| [three.js 0.186](https://threejs.org) | Escena 3D: carga los modelos GLB (GLTFLoader con descompresión meshopt), luces, lluvia y la apertura del aguacate |
 | [GSAP 3.15](https://gsap.com) + ScrollTrigger, SplitText, DrawSVG | Historia de scroll, titulares por líneas, recorrido horizontal, trazos que se dibujan |
 | [Lenis 1.3](https://lenis.darkroom.engineering) | Scroll suave sincronizado con ScrollTrigger |
 | Canvas 2D | Paisaje y lluvia de la sección La finca |
 
 Todas las librerías van dentro del proyecto, sin CDN. GSAP y sus plugins son gratuitos para uso comercial desde la 3.13. Licencias en `assets/vendor/LICENSES.md`.
 
-Si el navegador no tiene WebGL, el hero muestra dos imágenes del mismo aguacate (`assets/img/avocado-closed.webp` y `avocado-open.webp`, unos 45 KB cada una). Solo se descargan cuando hacen falta.
+Si el navegador no tiene WebGL, el hero muestra dos imágenes renderizadas desde los modelos (`assets/img/avocado-closed.webp` y `avocado-open.webp`, unos 45 KB cada una). Solo se descargan cuando hacen falta. Las fotos de las variedades y la imagen para redes salen también de los modelos.
 Con la opción del sistema "reducir movimiento" no hay scroll suave ni animaciones, el aguacate queda quieto y "Ábrelo" se muestra como sección estática.
 El 3D baja su resolución solo si el dispositivo no llega a buen ritmo, y se pausa cuando sale de pantalla.
+
+## Modelos 3D
+
+| Archivo | Contenido | Peso |
+|---|---|---|
+| `assets/models/aguacate.glb` | Aguacate entero con tallo y dos hojas | 1,5 MB |
+| `assets/models/aguacate-partido.glb` | Las dos mitades: pulpa, hueso, hueco con fibras y borde de piel | 1,7 MB |
+
+Los originales pesaban 15,8 MB y 17,5 MB. Se optimizaron con los scripts de `tools/`: malla simplificada, normales suaves sin costuras, materiales sin metal para tallo y nervios, texturas WebP y geometría comprimida con meshopt.
+El modelo entero se carga primero; el partido se descarga en segundo plano. Mientras llega, la apertura corta el modelo entero en dos con planos de recorte y dibuja la pulpa con la forma real de la sección. Si WebGL no está disponible o los modelos fallan, la web usa el aguacate generado por código.
+
+Para regenerar los modelos desde los originales, se copian a una carpeta `originales/` (no se sube al repositorio) y se ejecuta:
+
+```bash
+npm install
+npm run build:modelo-entero
+npm run build:modelo-partido
+```
+
+La textura trasera del modelo entero tiene una costura. Por eso el aguacate de la portada se balancea solo por su cara buena.
 
 ## Cambiar datos de contacto, redes y temporada
 
@@ -113,6 +133,8 @@ assets/js/recetas.js    Recetario
 assets/js/main.js       Interacción, scroll y animaciones
 assets/js/scene.js      Escena 3D compilada
 src/scene.js            Escena 3D (fuente)
+assets/models/          Modelos GLB optimizados
+tools/                  Scripts de optimización de los modelos
 assets/vendor/          GSAP, plugins y Lenis
 assets/img/             Favicon, imágenes de respaldo del aguacate (WebP) e imagen para redes
 ```
