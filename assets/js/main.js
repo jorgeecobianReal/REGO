@@ -256,19 +256,21 @@
     leaf:  { f: 2.3,  z: .14, gain: 4.6, turb: 1.7 },
     fruit: { f: .58,  z: .07, gain: 3.6, turb: .35 }
   };
+  var windGo = null;   // lo llama la línea de tiempo del dibujo de la portada al terminar
   function initWind() {
     var svg = $('[data-wind-root]');
     if (!svg || reduce) return;
     var parts = $$('[data-wind]', svg).map(function (g, i) {
       var pv = g.getAttribute('data-pivot').split(' ').map(Number);
       var k = WIND[g.getAttribute('data-wind')];
-      return { g: g, k: k, px: pv[0], py: pv[1], a: 0, v: 0, ph: i * 1.7 + pv[0] * .01, w: 2 * Math.PI * k.f * (1 + (i % 2) * .12) };
+      return { g: g, k: k, px: pv[0], py: pv[1], a: 0, v: 0, ph: i * 2.4, w: 2 * Math.PI * k.f * (1 + (i % 2) * .12) };
     });
     var gusts = [];
     var nextGust = 1.5;
-    var push = 0;          // racha que añade el puntero al pasar por encima
+    var push = 0, pushIn = 0;   // racha que añade el puntero al pasar por encima
     var clock = 0;
-    var start = motion ? 2.4 : .3;   // espera a que la lámina termine de dibujarse
+    var start = motion ? 6 : .3;   // respaldo: normalmente arranca cuando el dibujo avisa
+    var mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
     var smooth = function (x) { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
 
     // Fuerza del viento en el instante t, llegando antes a las piezas de la izquierda
@@ -281,7 +283,7 @@
         if (q < 0) continue;
         g += gusts[i].amp * (q < gusts[i].rise ? smooth(q / gusts[i].rise) : Math.exp(-(q - gusts[i].rise) / gusts[i].decay));
       }
-      var turb = (Math.sin(1.9 * t + ph) + .6 * Math.sin(3.7 * t + 2 * ph) + .35 * Math.sin(6.3 * t + 3 * ph)) * .16 * (.45 + g);
+      var turb = (Math.sin(1.9 * t + ph) + .6 * Math.sin(3.7 * t + 2 * ph) + .35 * Math.sin(6.3 * t + 3 * ph) + .3 * Math.sin(11.3 * t + 4 * ph) + .2 * Math.sin(17.9 * t + 5 * ph)) * .16 * (.45 + g);
       // Remolinos lentos, algo por debajo del ritmo propio del fruto: lo mecen a un lado y a otro
       var sway = .2 * Math.sin(2.64 * t + ph) * (.6 + .4 * Math.sin(.13 * t + ph));
       return base + g + sway + turb * turbW;
@@ -295,7 +297,8 @@
         nextGust = clock + 2.8 + Math.random() * 3.7;
         gusts = gusts.filter(function (gu) { return clock - gu.t0 < 14; });
       }
-      push *= Math.exp(-dt * 1.6);
+      pushIn *= Math.exp(-dt * 1.6);
+      push += (pushIn - push) * Math.min(1, dt * 5);
       var ramp = smooth((clock - start) / 2.5);
       parts.forEach(function (p) {
         // El viento empuja hacia la derecha: en SVG eso es girar en negativo
@@ -319,7 +322,7 @@
       raf = requestAnimationFrame(frame);
     };
     var run = function (on) {
-      on = on && onScreen && !document.hidden;
+      on = on && onScreen && !document.hidden && !mqReduce.matches;
       if (on === running) return;
       running = on;
       if (on) { last = performance.now(); raf = requestAnimationFrame(frame); }
@@ -329,19 +332,23 @@
       new IntersectionObserver(function (en) { onScreen = en[0].isIntersecting; run(true); }).observe(svg);
     }
     document.addEventListener('visibilitychange', function () { run(true); });
+    // Si se activa "reducir movimiento" con la página abierta, el aguacate vuelve a su sitio y se queda quieto
+    mqReduce.addEventListener('change', function () {
+      if (mqReduce.matches) parts.forEach(function (p) { p.a = p.v = 0; p.g.removeAttribute('transform'); });
+      run(true);
+    });
 
     // Pasar el puntero por encima levanta una pequeña racha en esa dirección
-    var lastX = null, lastT = 0;
+    // Cuenta el recorrido, no la velocidad: igual con cualquier ratón, y con tope para no exagerar
+    var lastX = null;
     svg.parentNode.addEventListener('pointermove', function (e) {
       if (e.pointerType !== 'mouse') return;
-      if (lastX !== null) {
-        var vx = (e.clientX - lastX) / Math.max(8, e.timeStamp - lastT);
-        push = Math.max(-1.2, Math.min(1.2, push + vx * .35));
-      }
-      lastX = e.clientX; lastT = e.timeStamp;
+      if (lastX !== null) pushIn = Math.max(-.45, Math.min(.45, pushIn + (e.clientX - lastX) * .003));
+      lastX = e.clientX;
     });
     svg.parentNode.addEventListener('pointerleave', function () { lastX = null; });
     run(true);
+    return function () { start = Math.min(start, clock); };
   }
 
   /* ------------------------------------------------------------------
@@ -673,7 +680,7 @@
     gsap.from($$('[data-intro]'), { opacity: 0, y: 18, duration: 1.2, stagger: .1, delay: .45, ease: 'power3.out', clearProps: 'transform,opacity' });
     gsap.from('.site-header', { opacity: 0, duration: 1, delay: .2, ease: 'power1.out', clearProps: 'opacity' });
     var art = $('.hero__art .art');
-    if (art) plateTimeline(art).delay(.35);
+    if (art) plateTimeline(art).delay(.35).call(function () { if (windGo) windGo(); }, null, 2.2);
     gsap.from('.hero__art .plate__cap', { autoAlpha: 0, duration: 1, delay: 2 });
   }
 
@@ -770,7 +777,7 @@
   buildCalendar();
   stipple();
   contours();
-  initWind();
+  windGo = initWind();
   initRipeness();
   initRecipes();
   initMenu();
