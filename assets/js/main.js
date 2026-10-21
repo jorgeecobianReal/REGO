@@ -244,6 +244,107 @@
   }
 
   /* ------------------------------------------------------------------
+     Viento en la lámina de la portada
+     El fruto cuelga del pedúnculo como un péndulo pesado, las hojas
+     tiemblan más deprisa y la rama apenas cede. Cada pieza es un muelle
+     amortiguado que persigue la fuerza del viento: rachas irregulares que
+     llegan de izquierda a derecha, con un fondo de brisa y turbulencia.
+     ------------------------------------------------------------------ */
+  var WIND = {
+    //        frecuencia (Hz), amortiguación, grados por unidad de viento, turbulencia
+    twig:  { f: 1.15, z: .3,  gain: .6,  turb: .5 },
+    leaf:  { f: 2.3,  z: .14, gain: 4.6, turb: 1.7 },
+    fruit: { f: .58,  z: .07, gain: 3.6, turb: .35 }
+  };
+  function initWind() {
+    var svg = $('[data-wind-root]');
+    if (!svg || reduce) return;
+    var parts = $$('[data-wind]', svg).map(function (g, i) {
+      var pv = g.getAttribute('data-pivot').split(' ').map(Number);
+      var k = WIND[g.getAttribute('data-wind')];
+      return { g: g, k: k, px: pv[0], py: pv[1], a: 0, v: 0, ph: i * 1.7 + pv[0] * .01, w: 2 * Math.PI * k.f * (1 + (i % 2) * .12) };
+    });
+    var gusts = [];
+    var nextGust = 1.5;
+    var push = 0;          // racha que añade el puntero al pasar por encima
+    var clock = 0;
+    var start = motion ? 2.4 : .3;   // espera a que la lámina termine de dibujarse
+    var smooth = function (x) { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
+
+    // Fuerza del viento en el instante t, llegando antes a las piezas de la izquierda
+    var field = function (t, x, ph, turbW) {
+      t -= (x - 40) / 320;
+      var base = .14 + .06 * Math.sin(.21 * t) + .04 * Math.sin(.47 * t + 1);
+      var g = 0;
+      for (var i = 0; i < gusts.length; i++) {
+        var q = t - gusts[i].t0;
+        if (q < 0) continue;
+        g += gusts[i].amp * (q < gusts[i].rise ? smooth(q / gusts[i].rise) : Math.exp(-(q - gusts[i].rise) / gusts[i].decay));
+      }
+      var turb = (Math.sin(1.9 * t + ph) + .6 * Math.sin(3.7 * t + 2 * ph) + .35 * Math.sin(6.3 * t + 3 * ph)) * .16 * (.45 + g);
+      // Remolinos lentos, algo por debajo del ritmo propio del fruto: lo mecen a un lado y a otro
+      var sway = .2 * Math.sin(2.64 * t + ph) * (.6 + .4 * Math.sin(.13 * t + ph));
+      return base + g + sway + turb * turbW;
+    };
+
+    var step = function (dt) {
+      clock += dt;
+      if (clock > nextGust) {
+        // Rachas cortas: al soltar, el fruto vuelve y se pasa un poco al otro lado
+        gusts.push({ t0: clock, amp: .35 + Math.random() * .45, rise: .6 + Math.random() * .5, decay: 1 + Math.random() });
+        nextGust = clock + 2.8 + Math.random() * 3.7;
+        gusts = gusts.filter(function (gu) { return clock - gu.t0 < 14; });
+      }
+      push *= Math.exp(-dt * 1.6);
+      var ramp = smooth((clock - start) / 2.5);
+      parts.forEach(function (p) {
+        // El viento empuja hacia la derecha: en SVG eso es girar en negativo
+        var target = -(field(clock, p.px, p.ph, p.k.turb) + push) * p.k.gain * ramp;
+        var acc = p.w * p.w * (target - p.a) - 2 * p.k.z * p.w * p.v;
+        p.v += acc * dt;
+        p.a += p.v * dt;
+      });
+    };
+    var draw = function () {
+      parts.forEach(function (p) { p.g.setAttribute('transform', 'rotate(' + p.a.toFixed(3) + ' ' + p.px + ' ' + p.py + ')'); });
+    };
+
+    var running = false, last = 0, raf = 0, onScreen = true;
+    var frame = function (now) {
+      var dt = Math.min(.05, (now - last) / 1000 || 0);
+      last = now;
+      // Pasos pequeños para que los muelles sean estables aunque baje la tasa de fotogramas
+      for (var n = Math.ceil(dt / (1 / 240)), i = 0; i < n; i++) step(dt / n);
+      draw();
+      raf = requestAnimationFrame(frame);
+    };
+    var run = function (on) {
+      on = on && onScreen && !document.hidden;
+      if (on === running) return;
+      running = on;
+      if (on) { last = performance.now(); raf = requestAnimationFrame(frame); }
+      else cancelAnimationFrame(raf);
+    };
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (en) { onScreen = en[0].isIntersecting; run(true); }).observe(svg);
+    }
+    document.addEventListener('visibilitychange', function () { run(true); });
+
+    // Pasar el puntero por encima levanta una pequeña racha en esa dirección
+    var lastX = null, lastT = 0;
+    svg.parentNode.addEventListener('pointermove', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      if (lastX !== null) {
+        var vx = (e.clientX - lastX) / Math.max(8, e.timeStamp - lastT);
+        push = Math.max(-1.2, Math.min(1.2, push + vx * .35));
+      }
+      lastX = e.clientX; lastT = e.timeStamp;
+    });
+    svg.parentNode.addEventListener('pointerleave', function () { lastX = null; });
+    run(true);
+  }
+
+  /* ------------------------------------------------------------------
      4. Guía de maduración
      ------------------------------------------------------------------ */
   function initRipeness() {
@@ -669,6 +770,7 @@
   buildCalendar();
   stipple();
   contours();
+  initWind();
   initRipeness();
   initRecipes();
   initMenu();

@@ -240,7 +240,7 @@ html.menu-open .site-header { background: var(--bg); transform: none; }
 .plate { position: relative; }
 .art { width: 100%; height: auto; overflow: visible; color: var(--ink); }
 .art__fine { stroke-width: .7; }
-.art__stipple { fill: currentColor; }
+.art__stipple { fill: currentColor; stroke: none; }
 .wash--flesh { fill: var(--flesh); }
 .wash--edge { fill: none; stroke: var(--flesh-edge); stroke-width: 26; }
 .wash--skin { fill: none; stroke: var(--skin); stroke-width: 6; }
