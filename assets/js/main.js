@@ -14,7 +14,7 @@
   var MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
   var NS = 'http://www.w3.org/2000/svg';
   var AVO = 'M100 10C126 10 139 38 145 74C151 109 186 136 186 190C186 241 149 272 100 272C51 272 14 241 14 190C14 136 49 109 55 74C61 38 74 10 100 10Z';
-  var motion = !!(window.gsap && window.ScrollTrigger && !reduce);
+  var motion = !!(window.gsap && window.ScrollTrigger && window.SplitText && window.DrawSVGPlugin && !reduce);
 
   var clean = function (v) { return String(v || '').trim().replace(/^@/, ''); };
   var TIKTOK = clean(C.tiktok);
@@ -39,7 +39,6 @@
     $$('[data-social="instagram"]').forEach(function (a) { if (INSTAGRAM) a.href = 'https://www.instagram.com/' + INSTAGRAM + '/'; });
     $$('[data-handle="tiktok"]').forEach(function (el) { if (TIKTOK) el.textContent = '@' + TIKTOK; });
     $$('[data-handle="instagram"]').forEach(function (el) { if (INSTAGRAM) el.textContent = '@' + INSTAGRAM; });
-    $$('[data-handle-bare="tiktok"]').forEach(function (el) { if (TIKTOK) el.textContent = TIKTOK; });
 
     var videos = (C.tiktokVideos || []).filter(Boolean);
     var box = $('.social__videos');
@@ -58,6 +57,16 @@
     }
 
     $$('[data-year]').forEach(function (el) { el.textContent = new Date().getFullYear(); });
+
+    // Los perfiles del JSON-LD de Organization salen también de config.js
+    var ld = $('script[type="application/ld+json"]');
+    if (ld) {
+      try {
+        var org = JSON.parse(ld.textContent);
+        org.sameAs = [TIKTOK && 'https://www.tiktok.com/@' + TIKTOK, INSTAGRAM && 'https://www.instagram.com/' + INSTAGRAM + '/'].filter(Boolean);
+        ld.textContent = JSON.stringify(org);
+      } catch (e) { /* se queda el JSON-LD escrito en index.html */ }
+    }
   }
 
   /* ------------------------------------------------------------------
@@ -212,12 +221,10 @@
         + Math.sin(x * .011 + ph[1] - i * .2) * 2.5;
     };
     var out = '<g class="c-lines">';
-    var rows = [];
     for (var i = 0; i < N; i++) {
       var pts = [];
       for (var x = -40; x <= W + 40; x += 40) pts.push([x, profile(x, i)]);
-      out += '<path class="c-line" d="' + smoothPath(pts) + '"/>';
-      rows.push(i);
+      out += '<path class="c-line" vector-effect="non-scaling-stroke" d="' + smoothPath(pts) + '"/>';
     }
     out += '</g><g class="c-trees">';
     for (var r = 2; r < N - 2; r += 2) {
@@ -232,7 +239,7 @@
       var yy = profile(960, 0) - 6 + s * 22;
       rego.push([968 - s * 18 + Math.sin(s * 1.25) * 22, yy]);
     }
-    out += '<path class="c-rego" d="' + smoothPath(rego) + '"/>';
+    out += '<path class="c-rego" vector-effect="non-scaling-stroke" d="' + smoothPath(rego) + '"/>';
     svg.innerHTML = out;
   }
 
@@ -270,7 +277,7 @@
       if (s.t !== last) {
         title.textContent = s.t;
         text.textContent = s.d;
-        if (last && motion) gsap.fromTo([title, text], { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: .5, stagger: .05, ease: 'power2.out', overwrite: true });
+        if (last && motion) gsap.fromTo([title, text], { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: .5, stagger: .05, ease: 'power2.out', overwrite: true, clearProps: 'transform,opacity' });
         last = s.t;
       }
       range.setAttribute('aria-valuetext', s.t);
@@ -307,7 +314,7 @@
     RECETAS.forEach(function (r) { if (cats.indexOf(r.cat) === -1) cats.push(r.cat); });
     filters.innerHTML = ['Todas'].concat(cats).map(function (c) {
       var n = c === 'Todas' ? RECETAS.length : RECETAS.filter(function (r) { return r.cat === c; }).length;
-      return '<button type="button" class="recipe-filter" data-cat="' + esc(c) + '" aria-pressed="' + (c === 'Todas') + '">' + esc(c) + '<small>' + n + '</small></button>';
+      return '<button type="button" class="recipe-filter" data-cat="' + esc(c) + '" aria-pressed="' + (c === 'Todas') + '">' + esc(c) + '<small><span class="sr-only">, </span>' + n + '<span class="sr-only">' + (n === 1 ? ' receta' : ' recetas') + '</span></small></button>';
     }).join('');
 
     var hay = RECETAS.map(function (r) { return norm(plain(r.title) + ' ' + r.cat + ' ' + r.ingredients.join(' ')); });
@@ -321,20 +328,24 @@
     var rows = $$('.rrow', list);
     var visible = function () { return rows.filter(function (c) { return !c.hidden; }).map(function (c) { return Number(c.getAttribute('data-i')); }); };
 
+    var status = $('[data-recipe-status]');
     var refreshTimer = null;
     var apply = function (animate) {
       var q = norm(state.q.trim());
       var shown = 0;
+      var before = rows.map(function (c) { return !c.hidden; });
       rows.forEach(function (c, i) {
         var ok = (state.cat === 'Todas' || RECETAS[i].cat === state.cat) && (!q || hay[i].indexOf(q) !== -1);
         c.hidden = !ok;
         if (ok) shown++;
       });
       empty.hidden = shown > 0;
-      if (animate && motion) {
-        gsap.fromTo(rows.filter(function (c) { return !c.hidden; }), { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: .55, stagger: .03, ease: 'power2.out', clearProps: 'transform,opacity,visibility' });
-      }
-      if (window.ScrollTrigger) {
+      if (!animate) return;
+      // Solo entran con fundido las filas que acaban de aparecer
+      var added = rows.filter(function (c, i) { return !c.hidden && !before[i]; });
+      if (motion && added.length) gsap.fromTo(added, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .55, stagger: .03, ease: 'power2.out', clearProps: 'transform,opacity' });
+      if (status) status.textContent = shown ? shown + (shown === 1 ? ' receta' : ' recetas') + (state.cat !== 'Todas' ? ' en ' + state.cat : '') : 'No hay recetas con eso. Prueba con otro ingrediente o elige otra categoría.';
+      if (motion) {
         clearTimeout(refreshTimer);
         refreshTimer = setTimeout(function () { ScrollTrigger.refresh(); }, 160);
       }
@@ -392,9 +403,9 @@
       var b = e.target.closest('[data-go]');
       if (!b) return;
       render(Number(b.getAttribute('data-go')));
-      if (motion) gsap.fromTo(body, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: .5, ease: 'power2.out', clearProps: 'transform,opacity,visibility' });
       var t = $('.recipe__title', body);
       if (t) { t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); }
+      if (motion) gsap.fromTo(body, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .5, ease: 'power2.out', clearProps: 'transform,opacity' });
     });
 
     var open = function (i, opener) {
@@ -403,7 +414,7 @@
       if (typeof dialog.showModal === 'function') dialog.showModal();
       else dialog.setAttribute('open', '');
       html.classList.add('dialog-open');
-      if (motion) gsap.fromTo(dialog, { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .6, ease: 'expo.out', clearProps: 'transform,opacity,visibility' });
+      if (motion) gsap.fromTo(dialog, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: .6, ease: 'expo.out', clearProps: 'transform,opacity' });
     };
     var onClosed = function () {
       html.classList.remove('dialog-open');
@@ -422,30 +433,6 @@
     dialog.addEventListener('click', function (e) { if (e.target === dialog) close(); });
 
     apply(false);
-
-    // Datos estructurados para buscadores (Google entiende recetas)
-    try {
-      var ld = {
-        '@context': 'https://schema.org',
-        '@graph': RECETAS.map(function (r) {
-          return {
-            '@type': 'Recipe',
-            name: plain(r.title),
-            recipeCategory: r.cat,
-            totalTime: 'PT' + r.min + 'M',
-            recipeYield: r.serves + ' raciones',
-            recipeIngredient: r.ingredients,
-            recipeInstructions: r.steps.map(function (t) { return { '@type': 'HowToStep', text: t }; }),
-            keywords: 'aguacate, ' + r.variety,
-            author: { '@type': 'Organization', name: 'Rego dos Campos' }
-          };
-        })
-      };
-      var sc = document.createElement('script');
-      sc.type = 'application/ld+json';
-      sc.textContent = JSON.stringify(ld);
-      document.head.appendChild(sc);
-    } catch (err) { /* sin datos estructurados */ }
   }
 
   /* ------------------------------------------------------------------
@@ -456,18 +443,21 @@
     var menu = $('#mobile-menu');
     if (!btn || !menu) return;
     var label = $('.menu-toggle__text', btn);
+    var outside = [$('main'), $('.footer'), $('.skip')];
     var setMenu = function (open) {
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       label.textContent = open ? 'Cerrar' : 'Menú';
       html.classList.toggle('menu-open', open);
       menu.hidden = !open;
+      // Con el menú abierto, lo que queda detrás no recibe foco
+      outside.forEach(function (el) { if (el) el.inert = open; });
       if (open) {
-        if (motion) {
-          gsap.fromTo(menu, { autoAlpha: 0 }, { autoAlpha: 1, duration: .4, ease: 'power2.out' });
-          gsap.fromTo($$('nav li', menu), { y: 18, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .7, stagger: .05, delay: .1, ease: 'expo.out' });
-        }
         var first = $('a', menu);
         if (first) first.focus({ preventScroll: true });
+        if (motion) {
+          gsap.fromTo(menu, { opacity: 0 }, { opacity: 1, duration: .4, ease: 'power2.out' });
+          gsap.fromTo($$('nav li', menu), { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: .7, stagger: .05, delay: .1, ease: 'expo.out' });
+        }
       }
     };
     btn.addEventListener('click', function () { setMenu(btn.getAttribute('aria-expanded') !== 'true'); });
@@ -483,9 +473,14 @@
     var header = $('.site-header');
     if (!header) return;
     var lastY = window.scrollY, ticking = false;
+    var lockUntil = location.hash ? Date.now() + 2500 : 0;
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('a[href^="#"]')) { lockUntil = Date.now() + 1500; header.classList.remove('is-hidden'); }
+    });
     var update = function () {
       var y = Math.max(0, window.scrollY);
       header.classList.toggle('is-scrolled', y > 24);
+      if (Date.now() < lockUntil) { lastY = y; ticking = false; return; }
       if (!html.classList.contains('menu-open')) {
         if (y > lastY + 4 && y > 480) header.classList.add('is-hidden');
         else if (y < lastY - 4 || y < 480) header.classList.remove('is-hidden');
@@ -527,11 +522,16 @@
       if (!sum || !ans) return;
       sum.addEventListener('click', function (e) {
         e.preventDefault();
-        if (d.open) {
-          gsap.to(ans, { height: 0, autoAlpha: 0, duration: .45, ease: 'power2.inOut', onComplete: function () { d.open = false; gsap.set(ans, { clearProps: 'height,opacity,visibility' }); } });
+        var closing = d.classList.contains('is-closing');
+        gsap.killTweensOf(ans);
+        if (d.open && !closing) {
+          d.classList.add('is-closing');
+          gsap.to(ans, { height: 0, opacity: 0, duration: .45, ease: 'power2.inOut', onComplete: function () { d.open = false; d.classList.remove('is-closing'); gsap.set(ans, { clearProps: 'height,opacity' }); } });
         } else {
+          d.classList.remove('is-closing');
           d.open = true;
-          gsap.fromTo(ans, { height: 0, autoAlpha: 0 }, { height: 'auto', autoAlpha: 1, duration: .55, ease: 'power2.out', clearProps: 'height,opacity,visibility' });
+          if (closing) gsap.to(ans, { height: 'auto', opacity: 1, duration: .45, ease: 'power2.out', clearProps: 'height,opacity' });
+          else gsap.fromTo(ans, { height: 0, opacity: 0 }, { height: 'auto', opacity: 1, duration: .55, ease: 'power2.out', clearProps: 'height,opacity' });
         }
       });
     });
@@ -547,29 +547,30 @@
     var tl = gsap.timeline();
     var lines = drawn(svg);
     if (lines.length) tl.from(lines, { drawSVG: 0, duration: 1.7, stagger: .1, ease: 'power2.inOut' }, 0);
-    var wash = $$('.wash', svg);
+    var wash = $$('.wash, .art__fine-ring', svg);
     if (wash.length) tl.from(wash, { autoAlpha: 0, duration: 1.2, stagger: .05, ease: 'power1.out' }, .7);
     var pit = $$('.wash--pit', svg);
     if (pit.length) tl.from(pit, { scale: .82, transformOrigin: '50% 50%', duration: 1.2, ease: 'expo.out' }, .9);
     var dots = $$('.art__stipple', svg);
     if (dots.length) tl.from(dots, { autoAlpha: 0, duration: 1.4, ease: 'power1.out' }, 1.1);
     var calls = $$('.art__num, .art__dot', svg);
-    if (calls.length) tl.from(calls, { autoAlpha: 0, scale: .6, transformOrigin: '50% 50%', duration: .6, stagger: .12, ease: 'back.out(2)' }, 1.5);
+    if (calls.length) tl.from(calls, { autoAlpha: 0, scale: .6, transformOrigin: '50% 50%', duration: .7, stagger: .12, ease: 'power3.out' }, 1.5);
     return tl;
   }
 
   function splitLines(el, vars) {
     return SplitText.create(el, {
       type: 'lines', mask: 'lines', linesClass: 'split-line', autoSplit: true,
+      aria: /^H[1-6]$/.test(el.tagName) ? 'auto' : 'none',
       onSplit: function (self) { return gsap.from(self.lines, vars); }
     });
   }
 
   function intro() {
     var title = $('[data-intro-title]');
-    if (title) splitLines(title, { yPercent: 110, duration: 1.4, stagger: .1, ease: 'expo.out', delay: .1 });
-    gsap.from($$('[data-intro]'), { autoAlpha: 0, y: 18, duration: 1.2, stagger: .1, delay: .45, ease: 'power3.out', clearProps: 'transform' });
-    gsap.from('.site-header', { autoAlpha: 0, duration: 1, delay: .2, ease: 'power1.out', clearProps: 'opacity,visibility' });
+    if (title) splitLines(title, { yPercent: 120, duration: 1.4, stagger: .1, ease: 'expo.out', delay: .1 });
+    gsap.from($$('[data-intro]'), { opacity: 0, y: 18, duration: 1.2, stagger: .1, delay: .45, ease: 'power3.out', clearProps: 'transform,opacity' });
+    gsap.from('.site-header', { opacity: 0, duration: 1, delay: .2, ease: 'power1.out', clearProps: 'opacity' });
     var art = $('.hero__art .art');
     if (art) plateTimeline(art).delay(.35);
     gsap.from('.hero__art .plate__cap', { autoAlpha: 0, duration: 1, delay: 2 });
@@ -586,16 +587,25 @@
     });
 
     // Bloques y grupos: suben un poco y aparecen
+    // Se anima la opacidad, no la visibilidad: el contenido sigue disponible para lectores y teclado
+    var show = function (els, stagger) {
+      var seen = els.filter(function (e) { return e.getBoundingClientRect().bottom > 0; });
+      var past = els.filter(function (e) { return seen.indexOf(e) === -1; });
+      if (past.length) gsap.set(past, { opacity: 1, y: 0, clearProps: 'transform,opacity' });
+      if (seen.length) gsap.to(seen, { opacity: 1, y: 0, duration: 1.1, stagger: stagger, ease: 'power3.out', clearProps: 'transform,opacity' });
+    };
     var single = $$('[data-reveal]');
-    gsap.set(single, { autoAlpha: 0, y: 22 });
-    ScrollTrigger.batch(single, {
-      start: 'top 90%', once: true,
-      onEnter: function (els) { gsap.to(els, { autoAlpha: 1, y: 0, duration: 1.1, stagger: .08, ease: 'power3.out', clearProps: 'transform' }); }
-    });
+    gsap.set(single, { opacity: 0, y: 22 });
+    ScrollTrigger.batch(single, { start: 'top 90%', once: true, onEnter: function (els) { show(els, .08); } });
     $$('[data-reveal-group]').forEach(function (group) {
       var items = Array.prototype.slice.call(group.children);
-      gsap.set(items, { autoAlpha: 0, y: 22 });
-      onEnter(group, function () { gsap.to(items, { autoAlpha: 1, y: 0, duration: 1.1, stagger: .09, ease: 'power3.out', clearProps: 'transform' }); }, 'top 88%');
+      gsap.set(items, { opacity: 0, y: 22 });
+      onEnter(group, function () { show(items, .09); }, 'top 88%');
+    });
+    // Si el teclado llega a un bloque que aún no ha aparecido, se muestra al momento
+    document.addEventListener('focusin', function (e) {
+      var el = e.target.closest && e.target.closest('[data-reveal], [data-reveal-group] > *');
+      if (el) gsap.to(el, { opacity: 1, y: 0, duration: .3, overwrite: true, clearProps: 'transform,opacity' });
     });
 
     // Láminas e iconos que se dibujan al llegar
@@ -619,7 +629,7 @@
     if (land && land.firstChild) {
       var tl = gsap.timeline({ paused: true });
       tl.from($$('.c-line', land), { drawSVG: 0, duration: 2, stagger: .07, ease: 'power2.inOut' })
-        .from($$('.c-tree', land), { scale: 0, transformOrigin: '50% 50%', duration: .5, stagger: { each: .006, from: 'random' }, ease: 'back.out(2)' }, .9)
+        .from($$('.c-tree', land), { scale: 0, transformOrigin: '50% 50%', duration: .6, stagger: { each: .006, from: 'random' }, ease: 'power3.out' }, .9)
         .from($$('.c-rego', land), { drawSVG: 0, duration: 2.2, ease: 'power2.inOut' }, 1.2);
       onEnter(land, function () { tl.play(); }, 'top 78%');
     }
@@ -627,11 +637,14 @@
     // Cifras: cuentan una vez
     $$('[data-count]').forEach(function (el) {
       var target = Number(el.getAttribute('data-count'));
-      var prefix = el.getAttribute('data-prefix') || '';
-      var fmt = function (v) { return prefix + String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); };
-      var o = { v: 0 };
-      el.textContent = fmt(0);
-      onEnter(el, function () { gsap.to(o, { v: target, duration: 1.8, ease: 'power2.out', onUpdate: function () { el.textContent = fmt(o.v); }, onComplete: function () { el.textContent = fmt(target); } }); }, 'top 92%');
+      var fmt = function (v) { return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); };
+      // Ancho fijo con el valor final: la unidad no se mueve mientras crecen los dígitos
+      el.style.minWidth = Math.ceil(el.getBoundingClientRect().width) + 'px';
+      onEnter(el, function () {
+        var o = { v: 0 };
+        el.textContent = fmt(0);
+        gsap.to(o, { v: target, duration: 1.8, ease: 'power2.out', onUpdate: function () { el.textContent = fmt(o.v); }, onComplete: function () { el.textContent = fmt(target); } });
+      }, 'top 92%');
     });
 
     // Calendario: cada barra crece de izquierda a derecha
@@ -645,10 +658,8 @@
 
   function startMotion() {
     gsap.registerPlugin(ScrollTrigger, SplitText, DrawSVGPlugin);
-    html.classList.add('has-motion');
-    intro();
-    reveals();
-    window.addEventListener('load', function () { ScrollTrigger.refresh(); });
+    // La página está oculta (motion-pending) hasta que cada bloque tiene su estado inicial
+    try { intro(); reveals(); } finally { html.classList.remove('motion-pending'); }
   }
 
   /* ------------------------------------------------------------------
@@ -664,9 +675,13 @@
   initHeader();
   initFaq();
   if (motion) {
-    // Espera a las fuentes (máximo 1,2 s) para partir los titulares en líneas reales
+    // Espera a las fuentes (máximo 0,9 s) para partir los titulares en líneas reales
     var go = function () { if (!go.done) { go.done = true; startMotion(); } };
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
-    setTimeout(go, 1200);
+    setTimeout(go, 900);
+  } else {
+    html.classList.remove('motion-pending');
   }
+  // El desplazamiento suave de los enlaces internos se activa tras la carga: la llegada por ancla es directa
+  window.addEventListener('load', function () { requestAnimationFrame(function () { html.classList.add('is-ready'); }); });
 })();

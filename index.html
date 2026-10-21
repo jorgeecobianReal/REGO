@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rego dos Campos · Aguacates de Galicia</title>
-<meta name="description" content="Rego dos Campos es una finca de aguacates en Galicia. Cultivamos al ritmo del clima atlántico, recogemos a mano y compartimos el día a día de la finca y nuestras recetas.">
+<meta name="description" content="Finca de aguacates en Galicia. Cultivamos al ritmo del clima atlántico, recogemos a mano y compartimos recetas y el día a día de la finca.">
 <meta name="theme-color" content="#ECEEE8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#121611" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
@@ -14,6 +14,9 @@
 <meta property="og:title" content="Rego dos Campos · Aguacates de Galicia">
 <meta property="og:description" content="Aguacates criados con la lluvia de Galicia. Recetas, temporada y el día a día de la finca.">
 <meta property="og:image" content="assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Rego dos Campos, finca de aguacates en Galicia, con el dibujo de un aguacate en su rama">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="assets/fonts/spectral-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/hanken-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -21,7 +24,9 @@
 <script>
   (function (d) {
     d.classList.remove('no-js'); d.classList.add('js');
-    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('reduced-motion');
+    var rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    d.classList.add(rm ? 'reduced-motion' : 'motion-pending');
+    if (!rm) setTimeout(function () { d.classList.remove('motion-pending'); }, 3000);
   })(document.documentElement);
 </script>
 <script type="application/ld+json">
@@ -71,6 +76,7 @@
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">
       <span class="menu-toggle__text">Menú</span>
     </button>
+    <noscript><a class="menu-toggle" href="#indice">Índice</a></noscript>
   </div>
 </header>
 
@@ -114,7 +120,7 @@
       <dl class="hero__meta" data-intro>
         <div><dt>Clima</dt><dd>Atlántico, suave y lluvioso</dd></div>
         <div><dt>Variedades</dt><dd>Hass y Bacon</dd></div>
-        <div><dt>Ahora</dt><dd data-season-short>Feito en Galicia</dd></div>
+        <div><dt>Ahora</dt><dd data-season-short>De otoño a primavera</dd></div>
         <div><dt>Cosecha</dt><dd>A mano, árbol por árbol</dd></div>
       </dl>
     </div>
@@ -123,13 +129,13 @@
   <!-- ============ EL NOMBRE ============ -->
   <section class="section nome" id="nome">
     <div class="wrap grid">
-      <p class="label nome__label">O nome</p>
+      <p class="label nome__label" lang="gl">O nome</p>
       <div class="nome__body">
         <p class="nome__text" data-split><em>Rego</em>, en gallego, es el pequeño cauce por el que corre el agua entre los campos. De ahí viene nuestro nombre y también nuestra manera de trabajar: dejar que la lluvia, la tierra y el tiempo hagan su parte, y cuidar el resto a mano.</p>
         <svg class="rego-line" viewBox="0 0 1200 40" preserveAspectRatio="none" aria-hidden="true" focusable="false">
           <path data-draw d="M0 20C90 6 150 34 240 20S390 6 480 20 630 34 720 20 870 6 960 20 1110 34 1200 20"/>
         </svg>
-        <dl class="entry" data-reveal>
+        <dl class="entry" lang="gl" data-reveal>
           <dt class="entry__word">rego <span>s. m.</span></dt>
           <dd>
             <ol>
@@ -146,7 +152,7 @@
   <section class="section dentro" id="por-dentro">
     <div class="wrap">
       <header class="head">
-        <p class="label">Por dentro</p>
+        <p class="label">Anatomía</p>
         <h2 class="h2" data-split>Por dentro, <em>todo es tiempo.</em></h2>
       </header>
       <div class="dentro__grid">
@@ -199,7 +205,7 @@
           <p class="stat__text">Más de nueve mil kilómetros separan Galicia de Perú, uno de los grandes proveedores de aguacate de Europa. Un aguacate de aquí se ahorra el viaje.</p>
         </li>
         <li class="stat">
-          <p class="stat__num"><span data-count="7" data-prefix="4–">4–7</span><small>días</small></p>
+          <p class="stat__num"><span>4–7</span><small>días</small></p>
           <p class="stat__label">Fuera del árbol</p>
           <p class="stat__text">Es lo que suele tardar en ablandarse una vez recogido, a temperatura ambiente. En el árbol no madura: solo cuando se separa de él.</p>
         </li>
@@ -318,7 +324,7 @@
       <header class="head">
         <p class="label">Variedades</p>
         <h2 class="h2" data-split>Dos aguacates, <em>dos caracteres.</em></h2>
-        <p class="lead" data-reveal>En Galicia se plantan sobre todo dos variedades. Por fuera se parecen; al abrirlas, cada una cuenta algo distinto.</p>
+        <p class="lead" data-reveal>En Galicia se plantan sobre todo dos variedades. Comparten la forma de pera, pero la piel ya las delata, y al abrirlas cada una cuenta algo distinto.</p>
       </header>
       <div class="varieties">
         <article class="variety" data-reveal>
@@ -370,7 +376,7 @@
         <p class="lead" data-reveal>En Galicia la cosecha se concentra en los meses fríos y, según la variedad, se alarga hasta la primavera. El calendario es orientativo: cada año manda el árbol.</p>
       </header>
       <div class="season-block">
-        <p class="season" data-season data-reveal></p>
+        <p class="season" data-season data-reveal>Bacon, de octubre a enero; Hass, de diciembre a mayo.</p>
         <div class="cal-scroll" data-reveal>
           <table class="cal">
             <caption class="sr-only">Calendario orientativo de cosecha por variedad</caption>
@@ -456,20 +462,21 @@
         <label class="recipe-search" for="recipe-search">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
           <span class="sr-only">Buscar receta o ingrediente</span>
-          <input type="search" id="recipe-search" placeholder="Busca un ingrediente: huevo, salmón, chocolate…" autocomplete="off">
+          <input type="search" id="recipe-search" placeholder="Busca por ingrediente" autocomplete="off">
         </label>
       </div>
 
-      <ol class="recipe-list" aria-live="polite"></ol>
+      <p class="sr-only" role="status" data-recipe-status></p>
+      <ol class="recipe-list"></ol>
       <p class="recipe-empty" hidden>No hay recetas con eso. Prueba con otro ingrediente o elige otra categoría.</p>
       <noscript><p class="recipe-empty">Activa JavaScript para ver el recetario.</p></noscript>
     </div>
 
     <dialog class="recipe-dialog" id="recipe-dialog" aria-labelledby="rd-title">
+      <button class="recipe-dialog__close" type="button" aria-label="Cerrar receta">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
       <div class="recipe-dialog__scroll">
-        <button class="recipe-dialog__close" type="button" aria-label="Cerrar receta">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
-        </button>
         <div class="recipe-dialog__body"></div>
       </div>
     </dialog>
@@ -515,19 +522,19 @@
   <section class="section dicionario" id="dicionario">
     <div class="wrap">
       <header class="head">
-        <p class="label">Pequeno dicionario</p>
-        <h2 class="h2" data-split>Palabras <em>da finca.</em></h2>
+        <p class="label" lang="gl">Pequeno dicionario</p>
+        <h2 class="h2" lang="gl" data-split>Palabras <em>da finca.</em></h2>
         <p class="lead" data-reveal>Ocho palabras gallegas que se oyen entre los árboles. Algunas no tienen traducción exacta.</p>
       </header>
-      <dl class="words" data-reveal-group>
-        <div class="word"><dt>rego</dt><dd><span class="word__gl">Pequeno curso de auga.</span><span class="word__es">Arroyo, surco de riego</span></dd></div>
-        <div class="word"><dt>brétema</dt><dd><span class="word__gl">Néboa mesta.</span><span class="word__es">Niebla</span></dd></div>
-        <div class="word"><dt>orballo</dt><dd><span class="word__gl">Chuvia moi miúda.</span><span class="word__es">Llovizna, rocío</span></dd></div>
-        <div class="word"><dt>choiva</dt><dd><span class="word__gl">Auga que cae das nubes.</span><span class="word__es">Lluvia</span></dd></div>
-        <div class="word"><dt>leira</dt><dd><span class="word__gl">Terreo de cultivo.</span><span class="word__es">Parcela, finca</span></dd></div>
-        <div class="word"><dt>enxerto</dt><dd><span class="word__gl">Parte dunha planta unida a outra para que medre con ela.</span><span class="word__es">Injerto</span></dd></div>
-        <div class="word"><dt>colleita</dt><dd><span class="word__gl">Acción de recoller os froitos.</span><span class="word__es">Cosecha</span></dd></div>
-        <div class="word"><dt>sachar</dt><dd><span class="word__gl">Remover a terra co sacho.</span><span class="word__es">Escardar, cavar</span></dd></div>
+      <dl class="words" lang="gl" data-reveal-group>
+        <div class="word"><dt>socalco</dt><dd><span class="word__gl">Terreo chan feito nunha ladeira e suxeito cun muro de pedra.</span><span class="word__es" lang="es">Bancal, terraza</span></dd></div>
+        <div class="word"><dt>brétema</dt><dd><span class="word__gl">Néboa mesta.</span><span class="word__es" lang="es">Niebla</span></dd></div>
+        <div class="word"><dt>orballo</dt><dd><span class="word__gl">Chuvia moi miúda.</span><span class="word__es" lang="es">Llovizna, rocío</span></dd></div>
+        <div class="word"><dt>chuvia</dt><dd><span class="word__gl">Auga que cae das nubes.</span><span class="word__es" lang="es">Lluvia</span></dd></div>
+        <div class="word"><dt>leira</dt><dd><span class="word__gl">Terreo de cultivo.</span><span class="word__es" lang="es">Parcela, finca</span></dd></div>
+        <div class="word"><dt>enxerto</dt><dd><span class="word__gl">Parte dunha planta unida a outra para que medre con ela.</span><span class="word__es" lang="es">Injerto</span></dd></div>
+        <div class="word"><dt>colleita</dt><dd><span class="word__gl">Acción de recoller os froitos.</span><span class="word__es" lang="es">Cosecha</span></dd></div>
+        <div class="word"><dt>sachar</dt><dd><span class="word__gl">Remover a terra co sacho.</span><span class="word__es" lang="es">Escardar, cavar</span></dd></div>
       </dl>
     </div>
   </section>
@@ -610,10 +617,10 @@
   <div class="wrap">
     <div class="footer__top">
       <div class="footer__about">
-        <p class="footer__claim">Feito en Galicia, <em>con choiva e paciencia.</em></p>
+        <p class="footer__claim" lang="gl">Feito en Galicia, <em>con chuvia e paciencia.</em></p>
         <p class="footer__text">Rego dos Campos es una finca de aguacates en Galicia. Cultivamos al ritmo del clima atlántico, recogemos a mano y compartimos el día a día de la finca y nuestras recetas en TikTok e Instagram.</p>
       </div>
-      <nav class="footer__col" aria-label="Pie de página">
+      <nav class="footer__col" id="indice" aria-label="Pie de página">
         <p class="label">La web</p>
         <ul>
           <li><a href="#finca">La finca</a></li>
@@ -632,7 +639,6 @@
         </ul>
       </div>
     </div>
-    <p class="footer__word" aria-hidden="true">Rego dos Campos</p>
     <div class="footer__bottom">
       <span>© <span data-year>2026</span> Rego dos Campos</span>
       <a href="#top">Volver arriba</a>

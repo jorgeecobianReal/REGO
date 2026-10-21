@@ -28,7 +28,8 @@ Discretas y de una sola vez. Nada secuestra el scroll ni se queda fijo en pantal
 | Cifras y calendario | Los números cuentan hasta su valor y las barras de cosecha crecen mes a mes |
 | Interacción | Botones que se rellenan, filas de recetas que se desplazan al pasar el ratón, acordeón de preguntas, ventana de receta y menú móvil con transición suave |
 
-Con la opción del sistema "reducir movimiento" no hay ninguna animación y todo se ve desde el principio. Sin JavaScript también se ve todo el contenido salvo el recetario.
+Con la opción del sistema "reducir movimiento" no hay ninguna animación y todo se ve desde el principio. Sin JavaScript también se ve todo el contenido salvo el recetario, y en móvil el botón de menú se cambia por un enlace al índice del pie.
+Los bloques que aparecen al hacer scroll siguen disponibles para lectores de pantalla y teclado aunque aún no se hayan animado, y los textos en gallego van marcados como tales.
 
 ## Secciones
 
@@ -36,7 +37,7 @@ Con la opción del sistema "reducir movimiento" no hay ninguna animación y todo
 |---|---|
 | Portada | Titular, presentación, lámina del aguacate en su rama y cuatro datos rápidos (clima, variedades, temporada actual, cosecha) |
 | O nome | Qué significa *rego* en gallego, con su entrada de diccionario |
-| Por dentro | Lámina del aguacate abierto con piel, pulpa y hueso explicados |
+| Anatomía | Lámina del aguacate abierto con piel, pulpa y hueso explicados |
 | En cifras | Lluvia, meses en el árbol, kilómetros que no recorre y días de maduración |
 | La finca | Clima, agua y trabajo a mano, con la ladera de socalcos dibujada |
 | Aguacate de aquí | Reportaje con letra capital, cita destacada y ficha lateral |
@@ -46,7 +47,7 @@ Con la opción del sistema "reducir movimiento" no hay ninguna animación y todo
 | Guía | Control de madurez y consejos para saber si un aguacate está en su punto |
 | Recetario | 13 recetas con filtros, buscador por ingrediente y ficha completa en ventana |
 | Nutrición | Tres ideas clave y etiqueta nutricional por 100 g (USDA FoodData Central) |
-| Pequeno dicionario | Ocho palabras gallegas del campo |
+| Pequeno dicionario | Ocho palabras gallegas del campo (*brétema*, *orballo*, *chuvia*, *leira*, *enxerto*, *colleita*, *sachar* y *socalco*) |
 | Síguenos | Enlaces a TikTok e Instagram |
 | Preguntas | Ocho preguntas frecuentes, incluida la aclaración de que la finca no vende |
 
@@ -80,7 +81,7 @@ window.REGO_CONFIG = {
 Las recetas están en `assets/js/recetas.js`. Cada receta es un bloque con categoría, título, tiempo, raciones, dificultad, variedad, ingredientes, pasos y un consejo. Para añadir una, se copia un bloque, se cambia el `id` y se rellenan los campos. Los filtros y la ficha se actualizan solos.
 
 Las categorías disponibles son Desayunos, Para picar, Entrantes, Principales y Postres. Si se usa una nueva, aparece sola como filtro.
-Las recetas se publican también como datos estructurados de Google (schema.org Recipe).
+Las recetas no se publican como datos estructurados de Google: para salir como ficha de receta Google exige una foto de cada plato. Cuando haya fotos reales, se pueden añadir.
 
 ## Verla en local
 

@@ -1,8 +1,10 @@
 /**
  * Rego dos Campos · configuración editable
  * ---------------------------------------------------------------
- * Cambia aquí las redes sociales y la temporada.
- * No hace falta tocar nada más para actualizar la web.
+ * Cambia aquí las redes sociales y la temporada. Con JavaScript, la web
+ * actualiza sola los enlaces, los datos para buscadores y el calendario.
+ * Los enlaces escritos en index.html son el respaldo sin JavaScript:
+ * si cambia un usuario, conviene cambiarlo también allí.
  */
 window.REGO_CONFIG = {
   // Usuario de TikTok, sin la @
