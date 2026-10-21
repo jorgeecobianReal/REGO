@@ -801,10 +801,10 @@
       .to(count, { v: 100, duration: 1.4, ease: 'power2.inOut', onUpdate: function () { counter.textContent = Math.round(count.v); } }, 0);
   }
 
-  // La intro espera al aguacate 3D real, como mucho unos segundos
+  // La intro espera a los dos modelos 3D (entero y partido), como mucho unos segundos
   var sceneReady = Promise.race([
-    scene3d && scene3d.ready ? scene3d.ready : Promise.resolve(),
-    new Promise(function (r) { setTimeout(r, 4000); })
+    scene3d && scene3d.halvesReady ? scene3d.halvesReady : Promise.resolve(),
+    new Promise(function (r) { setTimeout(r, 6000); })
   ]);
   Promise.all([fontsReady, sceneReady, loaderTl ? loaderTl.then() : null]).then(init);
 
@@ -872,23 +872,24 @@
     var items = $$('.anatomy__item', openLayer);
     var lastOpen = null;
     var apply = function (p) {
-      var e = smoothstep(.14, .72, p);
+      // Avance lineal: la escena pone sus propias curvas a cada tiempo de la apertura
+      var e = Math.min(1, Math.max(0, (p - .08) / .8));
       if (scene3d) scene3d.setProgress(e);
       var h = 1 - smoothstep(.03, .2, p);
       gsap.set(heroLayer, { opacity: h, y: -36 * (1 - h) });
       heroLayer.style.pointerEvents = h > .5 ? 'auto' : 'none';
-      var o = smoothstep(.56, .78, p);
+      var o = smoothstep(.66, .86, p);
       gsap.set(openLayer, { opacity: o, y: 24 * (1 - o) });
       openLayer.style.pointerEvents = o > .5 ? 'auto' : 'none';
       items.forEach(function (it, i) {
-        var k = smoothstep(.6 + i * .06, .84 + i * .06, p);
-        gsap.set(it, { opacity: k, x: (i === 0 ? -1 : 1) * 18 * (1 - k) });
+        var k = smoothstep(.7 + i * .05, .9 + i * .05, p);
+        gsap.set(it, { opacity: k, x: (it.classList.contains('anatomy__item--pulpa') ? 1 : -1) * 18 * (1 - k) });
       });
       var isOpen = o > .5;
       if (isOpen !== lastOpen) { openLayer.setAttribute('aria-hidden', isOpen ? 'false' : 'true'); lastOpen = isOpen; }
       gsap.set(foot, { opacity: 1 - smoothstep(.02, .12, p) });
       if (scrim) scrim.style.opacity = h;
-      if (fbClosed) { var f = smoothstep(.35, .55, p); gsap.set(fbClosed, { opacity: 1 - f }); gsap.set(fbOpen, { opacity: f }); }
+      if (fbClosed) { var f = smoothstep(.4, .6, p); gsap.set(fbClosed, { opacity: 1 - f }); gsap.set(fbOpen, { opacity: f }); }
     };
     ScrollTrigger.create({ trigger: sec, start: 'top top', end: 'bottom bottom', scrub: true, onUpdate: function (self) { apply(self.progress); } });
     apply(0);

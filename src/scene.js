@@ -123,6 +123,42 @@ function skinTextures(kind) {
   return { map: tMap, bump: tBump, rough: tRough };
 }
 
+// Máscara radial para el charco de luz del suelo: opaco bajo el fruto, nada en los bordes
+function poolAlphaTexture() {
+  const S = 256;
+  const c = makeCanvas(S, S);
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+  // Charco pequeño y con caída rápida: el tercio exterior del plano queda del todo transparente,
+  // así su borde nunca se ve como una línea de horizonte aunque la cámara mire casi de canto
+  g.addColorStop(0, 'rgb(255,255,255)');
+  g.addColorStop(0.22, 'rgb(150,150,150)');
+  g.addColorStop(0.45, 'rgb(34,34,34)');
+  g.addColorStop(0.62, 'rgb(0,0,0)');
+  g.addColorStop(1, 'rgb(0,0,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, S, S);
+  return new THREE.CanvasTexture(c);
+}
+
+function fleshBumpTexture() {
+  const W = 512, H = 512;
+  const fine = valueNoise(W, H, 64, 64, 61);
+  const grain = valueNoise(W, H, 160, 160, 67);
+  const c = makeCanvas(W, H);
+  const im = c.getContext('2d').createImageData(W, H);
+  for (let i = 0; i < W * H; i++) {
+    const v = (fine[i] * 0.6 + grain[i] * 0.4) * 255;
+    const o = i * 4;
+    im.data[o] = im.data[o + 1] = im.data[o + 2] = v; im.data[o + 3] = 255;
+  }
+  c.getContext('2d').putImageData(im, 0, 0);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(2, 2);
+  return t;
+}
+
 function pitTextures() {
   const W = 512, H = 256;
   const low = valueNoise(W, H, 8, 4, 41);
@@ -371,35 +407,71 @@ export function createAvocadoScene(canvas) {
   } catch (err) {
     return null;
   }
+  // Nivel de calidad decidido antes del primer render (los shaders no se recompilan sobre la marcha)
+  const coarse = window.matchMedia('(pointer: coarse)').matches;
+  const mem = navigator.deviceMemory || 8;
+  const cores = navigator.hardwareConcurrency || 8;
+  const conn = navigator.connection || {};
+  const tier = (conn.saveData || mem <= 2) ? 'low' : (coarse || mem <= 4 || cores <= 4) ? 'mid' : 'high';
+  const TIER = { low: { shadow: 0, clearcoat: false, pr: 1.25 }, mid: { shadow: 512, clearcoat: false, pr: 1.5 }, high: { shadow: 1024, clearcoat: true, pr: 2 } }[tier];
+
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.0;
   renderer.localClippingEnabled = true;
+  renderer.shadowMap.enabled = TIER.shadow > 0;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
 
   const scene = new THREE.Scene();
   scene.fog = new THREE.Fog(BG, 6, 10);
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.55;
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.2).texture;
+  scene.environmentIntensity = 0.35;
   pmrem.dispose();
 
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 40);
   camera.position.set(0, 0.1, 5.4);
 
-  const key = new THREE.DirectionalLight(0xfff3d6, 2.6);
-  key.position.set(2.5, 3.2, 3.5);
+  const key = new THREE.DirectionalLight(0xffe6bf, 3.0);
+  key.position.set(2.6, 3.4, 3.0);
+  key.castShadow = TIER.shadow > 0;
+  key.shadow.mapSize.set(TIER.shadow || 512, TIER.shadow || 512);
+  key.shadow.camera.near = 1;
+  key.shadow.camera.far = 14;
+  key.shadow.camera.left = -2.4; key.shadow.camera.right = 2.4;
+  key.shadow.camera.top = 2.6; key.shadow.camera.bottom = -2.2;
+  key.shadow.bias = -0.0005;
+  key.shadow.normalBias = 0.03;
+  key.shadow.radius = 3;
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0xd9de7e, 2.2);
-  rim.position.set(-3.5, 1.5, -2.5);
+  scene.add(key.target);
+  // Luz principal: alta y algo frontal en el hero; rasante desde la derecha al abrir, para que las caras cortadas tengan terminador
+  const KEY_HERO = new THREE.Vector3(2.6, 3.4, 3.0);
+  const KEY_OPEN = new THREE.Vector3(3.8, 3.0, 1.9);
+  // Charco de luz en el suelo: da base al fruto y deja que la sombra se lea sobre el fondo oscuro
+  const pool = new THREE.SpotLight(0xfff0d0, 6, 14, 0.62, 1, 1.4);
+  pool.position.set(1.2, 4.6, 2.2);
+  pool.target.position.set(0, -1.1, 0);
+  scene.add(pool);
+  scene.add(pool.target);
+  const rim = new THREE.DirectionalLight(0xc4dcff, 2.6);        // contraluz frío: luz de día lluvioso
+  rim.position.set(-3.2, 2.4, -3.0);
   scene.add(rim);
-  const fill = new THREE.DirectionalLight(0x9fb8a8, 0.5);
-  fill.position.set(-2, -1, 3);
+  const rim2 = new THREE.DirectionalLight(0xc4dcff, 0);         // segundo contraluz, solo con el fruto abierto
+  rim2.position.set(3.4, 2.0, -2.8);
+  scene.add(rim2);
+  const fill = new THREE.DirectionalLight(0x9fb8a8, 0.35);
+  fill.position.set(-3, 0.4, 2.5);
   scene.add(fill);
-  const front = new THREE.DirectionalLight(0xfff6dc, 1.1);
+  const FILL_HERO = new THREE.Vector3(-3, 0.4, 2.5);
+  const FILL_OPEN = new THREE.Vector3(-3.4, 1.2, 2.0);
+  const front = new THREE.DirectionalLight(0xfff6dc, 0.25);     // solo para la piel del hero; se apaga al cortar
   front.position.set(0.4, 1.2, 6);
   scene.add(front);
-  scene.add(new THREE.AmbientLight(0x30402a, 0.5));
+  const ambient = new THREE.AmbientLight(0x30402a, 0.3);
+  scene.add(ambient);
+  const lightMix = { key: 1, rim: 1, fill: 1, front: 1, ambient: 1, env: 1 };
 
   /* Materiales */
   const skins = { hass: skinTextures('hass') };
@@ -412,7 +484,7 @@ export function createAvocadoScene(canvas) {
   const points = profilePoints();
   const cap = capGeometry(points);
   const pit = { x: 0, y: -0.34, r: 0.3 };
-  const fleshOpts = { roughness: 0.42, metalness: 0, envMapIntensity: 0.6, emissive: 0x2a2e10, emissiveIntensity: 0.45, clearcoat: 0.35, clearcoatRoughness: 0.35 };
+  const fleshOpts = { roughness: 0.55, metalness: 0, envMapIntensity: 0.6, clearcoat: 0.15, clearcoatRoughness: 0.45 };
   const fleshA = new THREE.MeshPhysicalMaterial(Object.assign({ map: fleshTexture(cap.outline, cap.box, pit, true) }, fleshOpts));
   const fleshB = new THREE.MeshPhysicalMaterial(Object.assign({ map: fleshTexture(cap.outline, cap.box, pit, false) }, fleshOpts));
   const pitTex = pitTextures();
@@ -482,11 +554,17 @@ export function createAvocadoScene(canvas) {
   let pitObj = pitMesh;
   const model = { ready: false, parts: [], planes: [], peelMats: [] };
 
-  /* Sombra de contacto */
+  /* Sombra de contacto (modelo procedural) y suelo que recibe la sombra real */
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.2), new THREE.MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2;
   shadow.position.y = -1.28;
   root.add(shadow);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(9, 9), new THREE.MeshStandardMaterial({ color: 0x141e13, roughness: 0.74, metalness: 0, transparent: true, alphaMap: poolAlphaTexture(), depthWrite: false }));
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -1.08;
+  ground.receiveShadow = true;
+  ground.renderOrder = -1;
+  root.add(ground);
 
   /* Lluvia */
   const N = 420;
@@ -508,6 +586,14 @@ export function createAvocadoScene(canvas) {
   const rain = new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0xd8dccb, transparent: true, opacity: 0.22, depthWrite: false }));
   scene.add(rain);
 
+  let slowFrames = 0, quality = 1;
+  canvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    api.stop();
+    document.documentElement.classList.add('no-webgl');
+    window.dispatchEvent(new CustomEvent('rego:scene-failed'));
+  });
+
   /* Estado */
   const state = {
     progress: 0, target: 0, px: 0, py: 0, tx: 0, ty: 0,
@@ -518,17 +604,18 @@ export function createAvocadoScene(canvas) {
     const portrait = state.aspect < 0.9;
     const e = state.progress;
     const tanH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    const needH = lerp(portrait ? 3.15 : 2.02, portrait ? 3.1 : 2.62, e);
+    const needH = lerp(portrait ? 3.3 : 2.02, portrait ? 3.1 : 2.62, e);
     const needW = lerp(0.82, 1.75, e);
     const dH = needH / tanH;
     const dW = needW / (tanH * state.aspect);
-    camera.position.z = Math.max(dH, dW);
-    camera.position.y = 0.05;
+    const cam = smoothstep(0.3, 0.8, e);
+    camera.position.z = Math.max(dH, dW) * (1 - 0.05 * cam);
+    camera.position.y = lerp(0.05, 1.15, cam);                   // picado de unos 10°: las caras cortadas se ven desde arriba
     const heroX = portrait ? 0 : Math.min(1.15, state.aspect * 0.62);
     root.position.x = lerp(heroX, 0, e);
-    root.position.y = lerp(portrait ? 1.25 : -0.2, portrait ? 0.12 : -0.62, e);
+    root.position.y = lerp(portrait ? 1.05 : -0.2, portrait ? 0.12 : -0.58, e);
     if (state.centered) { root.position.x = 0; root.position.y = lerp(0.05, 0, e); camera.position.z = Math.max(dH, dW) * 1.04; }
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(0, lerp(0, -0.28, cam), 0);
     // Niebla relativa a la cámara: el fruto queda limpio y la lluvia lejana se funde con el fondo
     scene.fog.near = camera.position.z - 0.2;
     scene.fog.far = camera.position.z + 4.5;
@@ -538,7 +625,7 @@ export function createAvocadoScene(canvas) {
     const parent = canvas.parentElement || canvas;
     const w = parent.clientWidth || 1, h = parent.clientHeight || 1;
     state.w = w; state.h = h; state.aspect = w / h;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, TIER.pr) * quality);
     renderer.setSize(w, h, false);
     camera.aspect = state.aspect;
     camera.updateProjectionMatrix();
@@ -548,56 +635,109 @@ export function createAvocadoScene(canvas) {
 
   function renderFrame(dt) {
     state.t += dt;
-    state.progress = lerp(state.progress, state.target, Math.min(1, dt * 7));
-    const e = smooth(state.progress);
-    const open = smooth(clamp01((e - 0.02) / 0.9));
+    state.progress = lerp(state.progress, state.target, 1 - Math.exp(-9 * dt));
+    // "open" avanza linealmente con el scroll; cada tiempo de la apertura tiene su propia curva
+    const open = clamp01(state.progress);
+    const e = open;
+    const openP = smooth(open);            // versión suavizada para el corte calculado
+    const still = smoothstep(0.0, 0.16, open);   // el fruto deja de balancearse
 
-    // Mitades
-    halfA.position.x = -0.92 * open;
-    halfB.position.x = 0.92 * open;
-    halfA.rotation.y = (Math.PI / 2) * open;
-    halfB.rotation.y = -(Math.PI / 2) * open;
-    halfA.rotation.z = 0.16 * open;
-    halfB.rotation.z = -0.16 * open;
-    halfA.position.y = Math.sin(open * Math.PI) * 0.1;
-    halfB.position.y = Math.sin(open * Math.PI) * 0.1;
-    if (model.leafPivot) model.leafPivot.rotation.y = -halfA.rotation.y;
-    if (halves.ready) {
-      const L = halves.L.outer, R = halves.R.outer;
-      L.position.x = -halves.sep * open;
-      R.position.x = halves.sep * open;
-      L.rotation.y = (Math.PI / 2) * (1 - open);
-      R.rotation.y = -(Math.PI / 2) * (1 - open);
-      L.rotation.z = 0.1 * open;
-      R.rotation.z = -0.1 * open;
-      L.position.y = R.position.y = Math.sin(open * Math.PI) * 0.1;
-      halves.pivot.rotation.y = -L.rotation.y;
-      const fade = 1 - smoothstep(0.0, 0.14, open);
-      halves.whole.visible = fade > 0.01;
-      halves.wholeMat.opacity = fade;
-      halves.wholeMat.transparent = fade < 0.999;
-      const showHalves = open > 0.0005;
-      halves.L.meshes.visible = showHalves;
-      halves.R.meshes.visible = showHalves;
+    // Corte calculado (planos de recorte) mientras no han llegado las mitades reales
+    if (!halves.ready) {
+      halfA.position.x = -0.92 * openP;
+      halfB.position.x = 0.92 * openP;
+      halfA.rotation.y = (Math.PI / 2) * openP;
+      halfB.rotation.y = -(Math.PI / 2) * openP;
+      halfA.rotation.z = 0.16 * openP;
+      halfB.rotation.z = -0.16 * openP;
+      halfA.position.y = Math.sin(openP * Math.PI) * 0.1;
+      halfB.position.y = Math.sin(openP * Math.PI) * 0.1;
+      if (model.leafPivot) model.leafPivot.rotation.y = -halfA.rotation.y;
+      const pop = 0.82 + 0.18 * smoothstep(0.55, 0.85, openP);
+      pitObj.scale.set(0.96 * pop, 1.08 * pop, 0.96 * pop);
     }
-    const pop = 0.82 + 0.18 * smoothstep(0.55, 0.85, open);
-    pitObj.scale.set(0.96 * pop, 1.08 * pop, 0.96 * pop);
 
-    // Luz que respira: nubes pasando
-    key.intensity = 2.6 + Math.sin(state.t * 0.45) * 0.35;
-    rim.position.x = -3.5 + Math.sin(state.t * 0.3) * 0.8;
+    // Mitades reales: cuchillo → apertura de libro → asentamiento
+    if (halves.ready) {
+      const H = halves;
+      const k = smoothstep(0.02, 0.26, open);                    // el cuchillo rodea el fruto
+      const sRaw = clamp01((open - 0.27) / 0.46);                // 0.27..0.73: la tapa se abre
+      const s = Math.pow(sRaw, 2.6) / (Math.pow(sRaw, 2.6) + Math.pow(1 - sRaw, 1.7));  // arranque lento (rompe la pulpa), medio rápido, llegada suave
+      const t = smoothstep(0.7, 1.0, open);                       // composición final
 
-    // Movimiento: giro lento y flotación en el hero, quietud al abrir
+      // Hero: piel sin recorte; en cuanto hay corte, piel partida en tapa y fondo
+      const cut = open > 0.02;
+      H.heroSkin.visible = !cut;
+      H.skinFrontMesh.visible = cut;
+      H.skinBackMesh.visible = cut;
+
+      // Cuchillo: la línea de corte y el borde de piel avanzan alrededor del fruto desde el tallo
+      H.knife.visible = k > 0.001 && sRaw < 0.02;
+      H.knifeMat.uCut.value = k < 0.999 ? k : 2;
+
+      // Bisagra: ángulo objetivo según el scroll, seguido por un muelle (vida real al arrancar y al llegar)
+      const target = Math.PI * (1 - s) - 0.07 * t;
+      if (dt > 0) {
+        const kS = 110, cS = 2 * Math.sqrt(kS) * 0.78;
+        const acc = (target - H.theta) * kS - H.thetaV * cS;
+        H.thetaV += acc * dt;
+        H.theta += H.thetaV * dt;
+      } else { H.theta = target; H.thetaV = 0; }
+      const th = H.theta;
+      const sh = clamp01(1 - th / Math.PI);                        // apertura mostrada 0..1
+      const pry = Math.sin(Math.PI * sh);                          // la palanca acompaña al giro
+      const life = smoothstep(0.72, 0.9, open);
+      const liftY = 0.06 * pry - 0.03 * t + Math.sin(state.t * 0.8 + 1.2) * 0.02 * life;
+      H.hinge.rotation.y = th + 0.012 * Math.sin(state.t * 0.25) * life;
+      H.hinge.rotation.x = -0.12 * pry;
+      H.hinge.position.y = liftY / H.scH;
+      H.hingeW.rotation.copy(H.hinge.rotation);
+      H.hingeW.position.y = liftY;
+      // El conjunto se recentra conforme se abre
+      H.hv.position.x = -H.recenter * sh;
+      // Mitad del hueso: ligera inclinación final y vida propia
+      H.Lnode.rotation.z = 0.035 * t;
+      H.Lnode.rotation.y = 0.008 * Math.sin(state.t * 0.31 + 0.7) * life;
+      H.Lnode.position.y = (Math.sin(state.t * 0.8) * 0.02 * life) / H.scH;
+      H.hv.rotation.z = -0.02 * t;
+      // El interior de las mitades solo existe una vez empezado el corte
+      H.Lnode.visible = cut;
+      H.Rnode.visible = cut;
+    }
+    // Charco de luz en el suelo: aparece con la subida de la cámara (en el hero la fruta flota bajo la lluvia)
+    const groundOn = smoothstep(0.3, 0.8, open) * (state.ground === false ? 0 : 1);
+    ground.visible = groundOn > 0.005;
+    ground.material.opacity = groundOn;
+
+    // Luz: respira en el hero; al abrir la principal se vuelve rasante y entra un segundo contraluz
+    const lk = smoothstep(0.25, 0.8, open);
+    key.position.lerpVectors(KEY_HERO, KEY_OPEN, lk);
+    key.intensity = (3.0 + Math.sin(state.t * 0.45) * 0.35 * (1 - still) + 0.1 * lk) * lightMix.key;
+    rim.position.x = -3.2 + Math.sin(state.t * 0.3) * 0.6;
+    rim.intensity = 2.6 * lightMix.rim;
+    rim2.intensity = 1.2 * smoothstep(0.45, 0.8, open) * lightMix.rim;
+    fill.position.lerpVectors(FILL_HERO, FILL_OPEN, lk);
+    fill.intensity = (0.35 + 0.25 * lk) * lightMix.fill;
+    front.intensity = 0.25 * (1 - smoothstep(0.05, 0.2, open)) * lightMix.front;
+    ambient.intensity = 0.3 * lightMix.ambient;
+    scene.environmentIntensity = (0.35 + 0.1 * lk) * lightMix.env;
+    pool.intensity = 6 * lightMix.key;
+    rain.material.opacity = 0.22 * (1 - 0.55 * lk);
+
+    // Movimiento: balanceo y flotación en el hero, quietud al cortar
     state.px = lerp(state.px, state.tx, Math.min(1, dt * 4));
     state.py = lerp(state.py, state.ty, Math.min(1, dt * 4));
-    const idle = 1 - e;
+    const idle = 1 - still;
     // El modelo real se balancea solo por su cara buena (la textura trasera tiene costura)
     const sway = model.ready ? -0.72 + Math.sin(state.t * 0.35) * 0.18 : Math.sin(state.t * 0.35) * 0.55 - 0.35;
-    spin.rotation.y = (state.poseY !== undefined ? state.poseY : sway) * idle;
+    const rest = model.ready ? -0.6 : 0;
+    const base = state.poseY !== undefined ? state.poseY : sway;
+    spin.rotation.y = halves.ready ? lerp(base, rest, still) : base * idle;
     spin.rotation.z = -0.12 * idle;
     spin.position.y = Math.sin(state.t * 0.9) * 0.06 * idle;
     rig.rotation.y = state.px * (model.ready ? 0.18 : 0.45);
-    rig.rotation.x = -state.py * 0.25 + 0.08 * open;
+    rig.rotation.x = -state.py * 0.25 - 0.08 * smoothstep(0.3, 0.8, open);   // el par se inclina hacia la cámara
+    shadow.visible = !model.ready;
     shadow.scale.setScalar(1 + open * 0.55);
     shadow.material.opacity = 0.9 - open * 0.3;
     shadow.position.y = -1.28 + spin.position.y * 0.3;
@@ -616,11 +756,18 @@ export function createAvocadoScene(canvas) {
     if (model.ready) {
       scene.updateMatrixWorld();
       for (const c of model.planes) c.plane.copy(c.local).applyMatrix4(c.half.matrixWorld);
+      if (halves.ready) {
+        halves.knifeA.copy(halves.knifeALocal).applyMatrix4(halves.hv.matrixWorld);
+        halves.knifeB.copy(halves.knifeBLocal).applyMatrix4(halves.hv.matrixWorld);
+        halves.planeFront.copy(halves.frontLocal).applyMatrix4(halves.hingeW.matrixWorld);
+        halves.planeBack.copy(halves.backLocal).applyMatrix4(halves.hv.matrixWorld);
+        const c = new THREE.Vector3(0, 0, 0).applyMatrix4(halves.hv.matrixWorld);
+        halves.knifeMat.uCenter.value.set(c.x, c.y);
+      }
     }
     renderer.render(scene, camera);
   }
 
-  let slowFrames = 0, quality = 1;
   function loop(now) {
     const raw = (now - state.last) / 1000;
     const dt = Math.min(raw, 0.05);
@@ -631,7 +778,7 @@ export function createAvocadoScene(canvas) {
     if (slowFrames > 24 && quality > 0.6) {
       quality -= 0.2;
       slowFrames = 0;
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75) * quality);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, TIER.pr) * quality);
       renderer.setSize(state.w, state.h, false);
     }
     if (state.running) state.raf = requestAnimationFrame(loop);
@@ -677,7 +824,7 @@ export function createAvocadoScene(canvas) {
       obj.matrix.copy(ref.matrixWorld);
       obj.matrix.decompose(obj.position, obj.quaternion, obj.scale);
     };
-    const fleshOptsM = { roughness: 0.45, metalness: 0, envMapIntensity: 0.6, emissive: 0x2a2e10, emissiveIntensity: 0.45, clearcoat: 0.35, clearcoatRoughness: 0.35 };
+    const fleshOptsM = { roughness: 0.55, metalness: 0, envMapIntensity: 0.6, clearcoat: 0.15, clearcoatRoughness: 0.45 };
 
     const build = (half, side, extra) => {
       const group = new THREE.Group();
@@ -692,6 +839,7 @@ export function createAvocadoScene(canvas) {
       model.peelMats.push(mat);
       const fruit = new THREE.Mesh(fruitSrc.geometry, mat);
       placeLike(fruit, fruitSrc);
+      fruit.castShadow = true;
       wrap.add(fruit);
       model.planes.push({ half, plane, local: new THREE.Plane(new THREE.Vector3(side, 0, 0), 0) });
 
@@ -705,7 +853,7 @@ export function createAvocadoScene(canvas) {
           if (!src) return;
           const e = src.clone(true);
           placeLike(e, src);
-          e.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.metalness = 0; } });
+          e.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.metalness = 0; o.castShadow = true; } });
           wrapL.add(e);
         });
         group.add(pivot);
@@ -742,8 +890,26 @@ export function createAvocadoScene(canvas) {
     renderFrame(0);
   }
 
-  /* Mitades reales: sustituyen al corte calculado cuando terminan de cargar */
+  /* Mitades reales: cortar y abrir como un libro */
   const halves = { ready: false };
+
+  // Material físico a partir del material del GLB
+  function physical(src, extra) {
+    const m = new THREE.MeshPhysicalMaterial(Object.assign({
+      map: src.map || null,
+      normalMap: src.normalMap || null,
+      roughnessMap: src.roughnessMap || null,
+      roughness: src.roughnessMap ? 1 : src.roughness,
+      metalness: 0,
+      color: src.color ? src.color.clone() : new THREE.Color(0xffffff),
+      vertexColors: !!src.vertexColors,
+      side: THREE.DoubleSide
+    }, extra));
+    if (src.normalMap) m.normalScale.copy(src.normalScale || new THREE.Vector2(1, 1));
+    m.name = src.name;
+    return m;
+  }
+
   function installHalves(gltf) {
     const src = gltf.scene;
     src.updateMatrixWorld(true);
@@ -760,68 +926,200 @@ export function createAvocadoScene(canvas) {
     const boxR = new THREE.Box3().setFromObject(peelOf(huecoSrc));
     const scH = 2.06 / (boxL.max.y - boxL.min.y);
     const tyH = -1 - boxL.min.y * scH;
+    const zc = Math.max(boxL.max.z, boxR.max.z);              // plano de corte (caras cortadas miran a +z)
+    const xh = boxL.max.x;                                    // bisagra: eje vertical en el borde de la mitad del hueso
+    const gapR = boxR.min.x - boxL.max.x;                     // hueco del modelo entre mitades: la tapa se acerca hasta tocar
+    const cxL = (boxL.min.x + boxL.max.x) / 2;
 
-    const makeHalf = (srcGroup, box) => {
-      const outer = new THREE.Group();
-      const meshes = new THREE.Group();
-      const wrap = new THREE.Group();
-      wrap.scale.setScalar(scH);
-      wrap.position.set(-((box.min.x + box.max.x) / 2) * scH, tyH, -box.max.z * scH);
-      const c = srcGroup.clone(true);
-      W.placeLike(c, srcGroup);
-      c.traverse((o) => {
+    // Silueta del fruto cerrado igual a la del modelo entero
+    const wholeBox = new THREE.Box3().setFromObject(W.fruitSrc);
+    const wholeW = (wholeBox.max.x - wholeBox.min.x) * W.sc;
+    const wholeD = (wholeBox.max.z - wholeBox.min.z) * W.sc;
+    const closedW = (boxL.max.x - boxL.min.x) * scH;
+    const closedD = (zc - Math.min(boxL.min.z, boxR.min.z)) * 2 * scH;
+    // Una sola escala en x/z: una escala distinta por eje sobre la bisagra cizalla la tapa al girar
+    const sxz = Math.sqrt(THREE.MathUtils.clamp(wholeW / closedW, 0.9, 1.25) * THREE.MathUtils.clamp(wholeD / closedD, 0.9, 1.25));
+    const sx = sxz, sz = sxz;
+
+    // Jerarquía: spin > book > hv > hvScale > { Lnode, hinge > Rnode }
+    const book = new THREE.Group();
+    book.rotation.y = 0.6;                                     // compensa el giro de reposo del fruto (-0.6)
+    const hv = new THREE.Group();
+    const hvScale = new THREE.Group();
+    hvScale.scale.set(scH * sx, scH, scH * sz);
+    hvScale.position.set(-cxL * scH * sx, tyH, -zc * scH * sz);
+    book.add(hv); hv.add(hvScale); spin.add(book);
+
+    // Los mapas de normales de pulpa, hueso y hueco del GLB son planos: se sustituyen por relieve procedural
+    const fleshBump = fleshBumpTexture();
+    const cc = TIER.clearcoat;
+    const tune = (root, isLid) => {
+      root.traverse((o) => {
         if (!o.isMesh) return;
-        o.material = o.material.clone();
-        o.material.metalness = 0;
-        o.material.envMapIntensity = 1;
-        if (/flesh/i.test(o.material.name)) { o.material.roughness = 0.55; }
-        if (/peel/i.test(o.material.name)) { o.material.normalScale = new THREE.Vector2(1.1, 1.1); model.peelMats.push(o.material); }
+        const n = o.material.name || '';
+        if (/peel/i.test(n)) {
+          // La piel la pone el modelo entero (fotorrealista); la del partido se oculta y se liberan sus texturas
+          o.visible = false;
+          ['map', 'normalMap', 'roughnessMap', 'metalnessMap'].forEach((k) => { if (o.material[k]) o.material[k].dispose(); });
+          return;
+        }
+        if (isLid && /stem|remnant|tallo/i.test(o.name + ' ' + n)) { o.visible = false; return; }  // el tallo va solo en la mitad del hueso
+        if (/flesh/i.test(n)) {
+          o.material = physical(o.material, { normalMap: null, bumpMap: fleshBump, bumpScale: 0.008, roughness: 0.6, roughnessMap: null, envMapIntensity: 0.7, clearcoat: cc ? 0.15 : 0, clearcoatRoughness: 0.45 });
+          o.receiveShadow = true;
+        } else if (/cavity|socket/i.test(n)) {
+          o.material = physical(o.material, { normalMap: null, roughness: 0.8, roughnessMap: null, envMapIntensity: 0.5 });
+          o.receiveShadow = true;
+        } else if (/pit/i.test(n)) {
+          o.material = physical(o.material, { normalMap: null, bumpMap: pitTex.bump, bumpScale: 0.25, roughness: 1, envMapIntensity: 0.5, clearcoat: cc ? 0.12 : 0, clearcoatRoughness: 0.6 });
+          o.receiveShadow = true;
+        } else {
+          o.material = o.material.clone();        // borde de piel y tallo: conservan sus colores por vértice
+          o.material.metalness = 0;
+          o.material.roughness = 0.7;
+          o.material.envMapIntensity = 0.6;
+          o.receiveShadow = true;
+        }
+        o.castShadow = true;
       });
-      wrap.add(c);
-      meshes.add(wrap);
-      outer.add(meshes);
-      spin.add(outer);
-      return { outer, meshes };
     };
-    halves.L = makeHalf(huesoSrc, boxL);
-    halves.R = makeHalf(huecoSrc, boxR);
-    halves.sep = 0.8;
 
-    // Rama y hojas del aguacate entero, en la mitad del hueso
-    const pivot = new THREE.Group();
+    const Lnode = huesoSrc.clone(true);
+    W.placeLike(Lnode, huesoSrc);
+    tune(Lnode, false);
+    hvScale.add(Lnode);
+
+    const hinge = new THREE.Group();
+    hinge.position.set(xh, 0, zc);
+    const Rnode = huecoSrc.clone(true);
+    W.placeLike(Rnode, huecoSrc);
+    Rnode.position.x -= xh + gapR; Rnode.position.z -= zc;
+    tune(Rnode, true);
+    hinge.add(Rnode);
+    hvScale.add(hinge);
+
+    // Cuchillo: una franja fina de la propia piel del entero (±0,012 alrededor del plano de corte),
+    // oscura, que se revela en ángulo alrededor del fruto empezando por el tallo
+    const knifeA = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0.009);
+    const knifeB = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0.009);
+    const knifeMat = new THREE.MeshStandardMaterial({ color: 0x1b2210, roughness: 1, metalness: 0, clippingPlanes: [knifeA, knifeB], polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -3 });
+    knifeMat.uCut = { value: 0 };
+    knifeMat.uCenter = { value: new THREE.Vector2(0, 0) };
+    const angularReveal = (mat) => (shader) => {
+      shader.uniforms.uCut = knifeMat.uCut;
+      shader.uniforms.uCenter = knifeMat.uCenter;
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying vec2 vKnifeXY;')
+        .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvKnifeXY = (modelMatrix * vec4(transformed, 1.0)).xy;');
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>', '#include <common>\nuniform float uCut; uniform vec2 uCenter; varying vec2 vKnifeXY;')
+        .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\n{ vec2 d = vKnifeXY - uCenter; float ang = atan(-d.x, d.y); float u = (ang + 3.14159265) / 6.2831853; if (u > uCut) discard; }');
+    };
+    knifeMat.onBeforeCompile = angularReveal(knifeMat);
+    [Lnode, Rnode].forEach((g) => g.traverse((o) => {
+      if (o.isMesh && /borde|lip/i.test(o.material.name || '')) { o.material.onBeforeCompile = angularReveal(o.material); o.material.customProgramCacheKey = () => 'lip-reveal'; }
+    }));
+    const knife = new THREE.Group();
+    knife.visible = false;
+    hv.add(knife);
+    // Rama y hojas del aguacate entero, fijas a la mitad del hueso, con la orientación del hero
+    const branch = new THREE.Group();
+    branch.rotation.y = -0.6;
     const wrapL = new THREE.Group();
     wrapL.scale.setScalar(W.sc);
     wrapL.position.y = W.ty;
-    pivot.add(wrapL);
+    branch.add(wrapL);
     [W.ramaSrc, W.hojaSrc].forEach((s0) => {
       if (!s0) return;
       const e = s0.clone(true);
       W.placeLike(e, s0);
-      e.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.metalness = 0; } });
+      e.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.metalness = 0; o.castShadow = true; } });
       wrapL.add(e);
     });
-    halves.L.outer.add(pivot);
-    halves.pivot = pivot;
+    hv.add(branch);
 
-    // Aguacate entero que se funde con las mitades al empezar a abrir
-    const wholeMat = model.peel.clone();
-    wholeMat.side = THREE.FrontSide;
-    model.peelMats.push(wholeMat);
-    const wholeWrap = new THREE.Group();
-    wholeWrap.scale.setScalar(W.sc);
-    wholeWrap.position.y = W.ty;
-    const whole = new THREE.Mesh(W.fruitSrc.geometry, wholeMat);
-    W.placeLike(whole, W.fruitSrc);
-    wholeWrap.add(whole);
-    spin.add(wholeWrap);
-    halves.whole = wholeWrap;
-    halves.wholeMat = wholeMat;
+    // Piel del fruto entero partida por el plano de corte: la parte trasera queda con la mitad del hueso
+    // y la delantera gira con la bisagra. Así la piel es siempre la fotorrealista del modelo entero.
+    const recenter = (xh - cxL) * scH * sx;
+    const hingeW = new THREE.Group();            // bisagra en unidades de escena (sin la escala no uniforme)
+    hingeW.position.set(recenter, 0, 0);
+    hingeW.rotation.y = Math.PI;
+    hv.add(hingeW);
+
+    const wholeRef = new THREE.Group();          // dónde está el fruto entero en el espacio de spin
+    wholeRef.scale.setScalar(W.sc);
+    wholeRef.position.y = W.ty;
+    spin.add(wholeRef);
+    scene.updateMatrixWorld(true);
+
+    const planeFront = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+    const planeBack = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+    const skinFront = model.peel.clone();
+    skinFront.clippingPlanes = [planeFront];
+    skinFront.clipShadows = true;
+    const skinBack = model.peel.clone();
+    skinBack.clippingPlanes = [planeBack];
+    skinBack.clipShadows = true;
+    model.peelMats.push(skinFront, skinBack);
+
+    const holderFor = (parent) => {
+      const holder = new THREE.Group();
+      holder.matrixAutoUpdate = false;
+      holder.matrix.copy(parent.matrixWorld).invert().multiply(wholeRef.matrixWorld);
+      const m = new THREE.Mesh(W.fruitSrc.geometry, parent === hingeW ? skinFront : skinBack);
+      W.placeLike(m, W.fruitSrc);
+      m.castShadow = true;
+      m.receiveShadow = true;
+      holder.add(m);
+      parent.add(holder);
+      return m;
+    };
+    const skinFrontMesh = holderFor(hingeW);
+    const skinBackMesh = holderFor(hv);
+    // Piel entera sin planos de recorte para el hero: una sola pasada mientras el fruto está cerrado
+    const heroHolder = new THREE.Group();
+    heroHolder.matrixAutoUpdate = false;
+    heroHolder.matrix.copy(hv.matrixWorld).invert().multiply(wholeRef.matrixWorld);
+    const heroSkin = new THREE.Mesh(W.fruitSrc.geometry, model.peel);
+    W.placeLike(heroSkin, W.fruitSrc);
+    heroSkin.castShadow = true;
+    heroHolder.add(heroSkin);
+    hv.add(heroHolder);
+    const knifeMesh = new THREE.Mesh(W.fruitSrc.geometry, knifeMat);
+    W.placeLike(knifeMesh, W.fruitSrc);
+    const knifeHolder = new THREE.Group();
+    knifeHolder.matrixAutoUpdate = false;
+    knifeHolder.matrix.copy(heroHolder.matrix);
+    knifeHolder.add(knifeMesh);
+    knife.add(knifeHolder);
+    spin.remove(wholeRef);
+
+    Object.assign(halves, {
+      hv, hvScale, Lnode, Rnode, hinge, hingeW, scH, recenter,
+      knife, knifeMat, knifeA, knifeB,
+      knifeALocal: new THREE.Plane(new THREE.Vector3(0, 0, -1), 0.009),
+      knifeBLocal: new THREE.Plane(new THREE.Vector3(0, 0, 1), 0.009),
+      planeFront, planeBack,
+      frontLocal: new THREE.Plane(new THREE.Vector3(0, 0, -1), 0),
+      backLocal: new THREE.Plane(new THREE.Vector3(0, 0, -1), 0.002),
+      skinFrontMesh, skinBackMesh, heroSkin, branch,
+      theta: Math.PI, thetaV: 0
+    });
+    hinge.rotation.y = Math.PI;
 
     halfA.visible = false;
     halfB.visible = false;
-    halves.ready = true;
-    model.mode = 'halves';
-    renderFrame(0);
+    book.visible = false;
+    const activate = () => {
+      book.visible = true;
+      halves.ready = true;
+      model.mode = 'halves';
+      renderFrame(0);
+    };
+    if (typeof renderer.compileAsync === 'function') {
+      return renderer.compileAsync(scene, camera).then(activate, activate);
+    }
+    activate();
   }
 
   let resolveReady, halvesReadyResolve;
@@ -837,8 +1135,9 @@ export function createAvocadoScene(canvas) {
       const halvesUrl = canvas.getAttribute('data-model-halves');
       if (model.ready && halvesUrl) {
         loader.load(halvesUrl, (g2) => {
-          try { installHalves(g2); } catch (err) { console.warn('Aguacate 3D: se mantiene el corte calculado.', err); }
-          halvesReadyResolve(halves.ready);
+          let p;
+          try { p = installHalves(g2); } catch (err) { console.warn('Aguacate 3D: se mantiene el corte calculado.', err); }
+          Promise.resolve(p).then(() => halvesReadyResolve(halves.ready));
         }, undefined, () => halvesReadyResolve(false));
       } else {
         halvesReadyResolve(false);
@@ -888,6 +1187,18 @@ export function createAvocadoScene(canvas) {
       skinMat.bumpScale = kind === 'bacon' ? 0.3 : 0.9;
       skinMat.clearcoat = kind === 'bacon' ? 0.45 : 0.22;
       skinMat.needsUpdate = true;
+      renderFrame(0);
+    },
+    setLightMix(mix) { Object.assign(lightMix, mix || {}); renderFrame(0); },
+    setGround(v) { state.ground = !!v; renderFrame(0); },
+    // Diagnóstico y renders de producto: oculta o muestra piezas de las mitades por nombre de material/objeto
+    setPartVisible(pattern, visible) {
+      if (!halves.ready) return;
+      const re = new RegExp(pattern, 'i');
+      const hit = (o) => re.test(o.name || '') || (o.material && re.test(o.material.name || ''));
+      [halves.Lnode, halves.Rnode, halves.knife, halves.branch].forEach((g) => g.traverse((o) => { if (o.isMesh && hit(o)) o.visible = !!visible; }));
+      if (re.test('skinFront')) halves.skinFrontMesh.visible = !!visible;
+      if (re.test('skinBack')) halves.skinBackMesh.visible = !!visible;
       renderFrame(0);
     },
     useModel(on) {

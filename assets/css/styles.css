@@ -500,11 +500,11 @@ html.no-webgl .scene__fallback { display: block; }
   color: var(--accent);
 }
 .anatomy__label::before { content: ""; width: 2.25rem; height: 1px; background: currentColor; }
-.anatomy__item--piel { left: max(var(--gutter), env(safe-area-inset-left, 0px)); top: 52%; }
-.anatomy__item--pulpa { right: max(var(--gutter), env(safe-area-inset-right, 0px)); top: 42%; }
-.anatomy__item--hueso { right: max(var(--gutter), env(safe-area-inset-right, 0px)); top: 64%; }
-.anatomy__item--pulpa, .anatomy__item--hueso { text-align: right; justify-items: end; }
-.anatomy__item--pulpa .anatomy__label, .anatomy__item--hueso .anatomy__label { flex-direction: row-reverse; }
+.anatomy__item--piel { left: max(var(--gutter), env(safe-area-inset-left, 0px)); top: 38%; }
+.anatomy__item--hueso { left: max(var(--gutter), env(safe-area-inset-left, 0px)); top: 62%; }
+.anatomy__item--pulpa { right: max(var(--gutter), env(safe-area-inset-right, 0px)); top: 50%; }
+.anatomy__item--pulpa { text-align: right; justify-items: end; }
+.anatomy__item--pulpa .anatomy__label { flex-direction: row-reverse; }
 
 .scene__foot {
   position: absolute;
