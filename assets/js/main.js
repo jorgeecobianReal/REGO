@@ -63,7 +63,7 @@
     if (ld) {
       try {
         var org = JSON.parse(ld.textContent);
-        org.sameAs = [TIKTOK && 'https://www.tiktok.com/@' + TIKTOK, INSTAGRAM && 'https://www.instagram.com/' + INSTAGRAM + '/'].filter(Boolean);
+        org.sameAs = [INSTAGRAM && 'https://www.instagram.com/' + INSTAGRAM + '/', TIKTOK && 'https://www.tiktok.com/@' + TIKTOK].filter(Boolean);
         ld.textContent = JSON.stringify(org);
       } catch (e) { /* se queda el JSON-LD escrito en index.html */ }
     }

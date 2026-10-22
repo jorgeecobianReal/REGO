@@ -37,7 +37,7 @@ Los bloques que aparecen al hacer scroll siguen disponibles para lectores de pan
 
 | Sección | Contenido |
 |---|---|
-| Portada | Titular, presentación, lámina del aguacate en su rama y cuatro datos rápidos (clima, variedades, temporada actual, cosecha) |
+| Portada | Titular, presentación, enlace a Instagram, lámina del aguacate en su rama y cuatro datos rápidos (clima, variedades, temporada actual, cosecha) |
 | O nome | Qué significa *rego* en gallego, con su entrada de diccionario |
 | Anatomía | Lámina del aguacate abierto con piel, pulpa y hueso explicados |
 | En cifras | Lluvia, meses en el árbol, kilómetros que no recorre y días de maduración |
@@ -50,7 +50,7 @@ Los bloques que aparecen al hacer scroll siguen disponibles para lectores de pan
 | Recetario | 13 recetas con filtros, buscador por ingrediente y ficha completa en ventana |
 | Nutrición | Tres ideas clave y etiqueta nutricional por 100 g (USDA FoodData Central) |
 | Pequeno dicionario | Ocho palabras gallegas del campo (*brétema*, *orballo*, *chuvia*, *leira*, *enxerto*, *colleita*, *sachar* y *socalco*) |
-| Síguenos | Enlaces a TikTok e Instagram |
+| Síguenos | Enlaces a Instagram (la cuenta principal) y TikTok, con tres postales para fotos |
 | Preguntas | Ocho preguntas frecuentes, incluida la aclaración de que la finca no vende |
 
 ## Tecnología
