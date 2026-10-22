@@ -199,7 +199,7 @@ html.motion-pending [data-reveal-group] > * { visibility: hidden; }
 .site-header.is-hidden { transform: translateY(calc(-100% - env(safe-area-inset-top, 0px))); }
 .site-header__inner { display: flex; align-items: center; gap: clamp(20px, 3vw, 48px); height: var(--header-h); }
 .brand { display: inline-flex; align-items: center; gap: .7em; margin-right: auto; padding-block: 12px; }
-.brand__mark { width: 22px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; color: var(--ink); }
+.brand__mark { width: 26px; height: 26px; fill: currentColor; color: var(--ink); margin-top: -3px; }
 .brand__name { font: 400 1.18rem/1 var(--serif); letter-spacing: -.005em; }
 .nav ul { display: flex; gap: clamp(18px, 2.4vw, 36px); }
 .nav a, .site-header__social { position: relative; font: 500 .86rem/1 var(--sans); letter-spacing: .01em; color: var(--muted); transition: color .3s; padding-block: .5em; }

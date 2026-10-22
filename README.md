@@ -13,7 +13,7 @@ Sobrio y editorial, pensado como un cuaderno de campo:
 - **Tipografías**: Spectral (titulares y textos largos) y Hanken Grotesk (texto de apoyo y etiquetas). Van dentro del proyecto, sin peticiones a Google Fonts.
 - **Ilustraciones** de línea como láminas botánicas numeradas: el aguacate en su rama, el corte longitudinal con sus partes, las dos variedades, la ladera con socalcos y el rego. Son SVG ligeros; el punteado de grabado y el paisaje se generan al cargar.
 - **Rejilla de 12 columnas**: titulares y textos arrancan en la cuarta columna y dejan un margen amplio a la izquierda; sin etiquetas pequeñas sobre las secciones.
-- **Marca**: un árbol de línea junto al nombre en la cabecera y en el icono de la pestaña. Es provisional: desde el entorno de trabajo no se pudo ver el logo de Instagram, y el árbol se redibujará copiando el del logo original.
+- **Marca**: junto al nombre, en la cabecera, va el árbol del logo de la finca redibujado en silueta limpia: copa ancha de pino piñonero, un piso más pequeño a la derecha y tronco alto y fino. El icono de la pestaña lo usa en crema sobre el verde oliva del logo.
 
 ## Animaciones
 
@@ -103,10 +103,9 @@ Abrir `index.html` directamente desde el disco también funciona.
 
 Desde el entorno de trabajo no se pudo abrir TikTok ni Instagram, así que estos puntos se redactaron con información general sobre el aguacate gallego y deben revisarse:
 
-1. **Logo.** El árbol de la cabecera es provisional hasta tener el logo original de Instagram.
-2. **Variedades y meses de cosecha.** El calendario usa Hass y Bacon con fechas orientativas.
-3. **Afirmaciones sobre la forma de trabajar**: recogida a mano, riego solo en verano, plantones injertados y cosecha decidida mirando el árbol.
-4. **Recetas**: son propuestas de la web; conviene revisarlas o sustituirlas por las que la finca enseñe en sus vídeos.
+1. **Variedades y meses de cosecha.** El calendario usa Hass y Bacon con fechas orientativas.
+2. **Afirmaciones sobre la forma de trabajar**: recogida a mano, riego solo en verano, plantones injertados y cosecha decidida mirando el árbol.
+3. **Recetas**: son propuestas de la web; conviene revisarlas o sustituirlas por las que la finca enseñe en sus vídeos.
 
 ## Estructura
 
