@@ -203,6 +203,32 @@
     return d;
   }
 
+  // Forma cerrada suave que pasa por una lista de puntos (Catmull-Rom cerrado)
+  function closedPath(pts) {
+    var n = pts.length, d = 'M' + pts[0][0].toFixed(2) + ' ' + pts[0][1].toFixed(2);
+    for (var i = 0; i < n; i++) {
+      var p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      d += 'C' + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(2) + ' ' + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(2) + ' ' +
+        (p2[0] - (p3[0] - p1[0]) / 6).toFixed(2) + ' ' + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(2) + ' ' +
+        p2[0].toFixed(2) + ' ' + p2[1].toFixed(2);
+    }
+    return d + 'Z';
+  }
+
+  // Aguacatero en miniatura con la base en (0, 0): copa ancha y redonda, algo irregular, sobre un tronco corto
+  function avocadoTree(rnd) {
+    var rx = 5.2 + rnd() * .9, ry = 4 + rnd() * .7, cy = -7.4 - rnd() * .5;
+    var f1 = rnd() * 6.3, f2 = rnd() * 6.3, pts = [];
+    for (var k = 0; k < 18; k++) {
+      var a = k / 18 * Math.PI * 2;
+      var w = 1 + .11 * Math.sin(5 * a + f1) + .05 * Math.sin(9 * a + f2);
+      var y = Math.sin(a) * ry * w;
+      pts.push([Math.cos(a) * rx * w, cy + (y > 0 ? y * .78 : y)]);   // la parte de abajo, algo más plana
+    }
+    var lean = (rnd() - .5) * .5;
+    return 'M-.55 0L' + (lean - .3).toFixed(2) + ' -4.4H' + (lean + .3).toFixed(2) + 'L.55 0Z' + closedPath(pts);
+  }
+
   // Lado de una cinta a partir de su eje: puntos desplazados por la normal
   function offsetSide(pts, widths, sign) {
     return pts.map(function (p, k) {
@@ -259,12 +285,19 @@
       var pts = xs.filter(function (v, k) { return k === 0 || v - xs[k - 1] > 4; }).map(function (v) { return [v, profile(v, i)]; });
       out += '<path class="c-line" vector-effect="non-scaling-stroke" d="' + smoothPath(pts) + '"/>';
     }
+    // Aguacateros en las terrazas, a los dos lados del rego. Las filas altas quedan más lejos:
+    // árboles más pequeños y más claros. Cada uno guarda su distancia al agua para brotar desde la orilla.
     out += '</g><g class="c-trees">';
-    for (var r = 2; r < N - 2; r += 2) {
-      for (var tx = 300 + (r % 4) * 9; tx < 860; tx += 28) {
-        if (cross[r] !== null && Math.abs(tx - cross[r]) < 30) continue;
-        var ty = profile(tx, r) - 4.2;
-        out += '<circle class="c-tree" cx="' + tx.toFixed(1) + '" cy="' + ty.toFixed(1) + '" r="2.6"/>';
+    var trnd = seeded(41);
+    for (var r = 2; r <= 10; r += 2) {
+      var depth = r / 10, size = .82 + .48 * depth, gap = 26 * size + 8;
+      for (var tx = 236 + (r % 4 ? gap / 2 : 0); tx < 1214; tx += gap) {
+        var jx = tx + (trnd() - .5) * 4;
+        var far = cross[r] === null ? 999 : Math.abs(jx - cross[r]);
+        if (far < 16 + 12 * size) continue;
+        var sc = size * (.9 + trnd() * .2);
+        out += '<path class="c-tree" data-d="' + Math.round(far) + '" opacity="' + (.62 + .38 * depth).toFixed(2) + '" transform="translate(' +
+          jx.toFixed(1) + ' ' + (profile(jx, r) - .4).toFixed(1) + ') scale(' + sc.toFixed(3) + ')" d="' + avocadoTree(trnd) + '"/>';
       }
     }
     out += '</g>';
@@ -793,7 +826,8 @@
     if (land && land.firstChild) {
       var tl = gsap.timeline({ paused: true });
       tl.from($$('.c-line', land), { drawSVG: 0, duration: 2, stagger: .07, ease: 'power2.inOut' })
-        .from($$('.c-tree', land), { scale: 0, transformOrigin: '50% 50%', duration: .6, stagger: { each: .006, from: 'random' }, ease: 'power3.out' }, .9)
+        .from($$('.c-tree', land).sort(function (a, b) { return a.getAttribute('data-d') - b.getAttribute('data-d'); }),
+          { scale: 0, transformOrigin: '50% 100%', duration: .9, stagger: { amount: 2.6 }, ease: 'back.out(1.6)' }, 1.6)
         .from($$('.c-source', land), { scale: 0, transformOrigin: '50% 50%', duration: .8, ease: 'power3.out' }, 1)
         .from($$('.c-ring', land), { autoAlpha: 0, duration: .6 }, 1.2)
         .from($$('.c-reveal', land), { drawSVG: 0, duration: 3.4, ease: 'power1.inOut' }, 1.2);

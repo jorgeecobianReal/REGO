@@ -338,7 +338,7 @@ html.menu-open .site-header { background: var(--bg); transform: none; }
   .contours .c-flow, .contours .c-ring { animation: none !important; }
   .contours .c-ring { display: none; }
 }
-.contours .c-tree { fill: var(--ink); }
+.contours .c-tree { fill: var(--ink); stroke: none; }
 .finca__cap { display: flex; gap: .9em; align-items: baseline; justify-content: flex-end; margin-top: 14px; font: 400 .82rem/1.4 var(--serif); color: var(--muted); }
 .facts { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); }
 .fact { grid-column: span 3; display: grid; align-content: start; gap: 10px; padding-top: 22px; border-top: 1px solid var(--line); }
