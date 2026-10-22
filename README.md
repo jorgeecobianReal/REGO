@@ -12,7 +12,8 @@ Sobrio y editorial, pensado como un cuaderno de campo:
 - **Modo oscuro** automático según el sistema del visitante, con los mismos tonos en versión noche.
 - **Tipografías**: Spectral (titulares y textos largos) y Hanken Grotesk (texto de apoyo y etiquetas). Van dentro del proyecto, sin peticiones a Google Fonts.
 - **Ilustraciones** de línea como láminas botánicas numeradas: el aguacate en su rama, el corte longitudinal con sus partes, las dos variedades, la ladera con socalcos y el rego. Son SVG ligeros; el punteado de grabado y el paisaje se generan al cargar.
-- **Rejilla de 12 columnas**: la etiqueta de cada sección a la izquierda y el contenido desde la cuarta columna.
+- **Rejilla de 12 columnas**: titulares y textos arrancan en la cuarta columna y dejan un margen amplio a la izquierda; sin etiquetas pequeñas sobre las secciones.
+- **Marca**: un árbol de línea junto al nombre en la cabecera y en el icono de la pestaña. Es provisional: desde el entorno de trabajo no se pudo ver el logo de Instagram, y el árbol se redibujará copiando el del logo original.
 
 ## Animaciones
 
@@ -67,7 +68,7 @@ Todo está en `assets/js/config.js`:
 ```js
 window.REGO_CONFIG = {
   tiktok: 'regodoscampos2',
-  instagram: 'regodoscampos',   // confirmar
+  instagram: 'regodoscampos',
   tiktokVideos: [],             // enlaces de vídeos para incrustar
   temporada: { Hass: [12, 1, 2, 3, 4, 5], Bacon: [10, 11, 12, 1] }
 };
@@ -102,7 +103,7 @@ Abrir `index.html` directamente desde el disco también funciona.
 
 Desde el entorno de trabajo no se pudo abrir TikTok ni Instagram, así que estos puntos se redactaron con información general sobre el aguacate gallego y deben revisarse:
 
-1. **Usuario de Instagram.** Está puesto `@regodoscampos`, sin verificar.
+1. **Logo.** El árbol de la cabecera es provisional hasta tener el logo original de Instagram.
 2. **Variedades y meses de cosecha.** El calendario usa Hass y Bacon con fechas orientativas.
 3. **Afirmaciones sobre la forma de trabajar**: recogida a mano, riego solo en verano, plantones injertados y cosecha decidida mirando el árbol.
 4. **Recetas**: son propuestas de la web; conviene revisarlas o sustituirlas por las que la finca enseñe en sus vídeos.

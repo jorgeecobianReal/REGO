@@ -10,7 +10,7 @@ window.REGO_CONFIG = {
   // Usuario de TikTok, sin la @
   tiktok: 'regodoscampos2',
 
-  // Usuario de Instagram, sin la @. CONFIRMAR: no se pudo verificar desde aquí.
+  // Usuario de Instagram, sin la @
   instagram: 'regodoscampos',
 
   // Vídeos de TikTok para mostrar en la web. Pega enlaces completos, por ejemplo:
