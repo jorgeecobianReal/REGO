@@ -31,6 +31,12 @@
   --ripe-dots: rgba(0, 0, 0, .42);
   --water: #4C716C;
   --water-glint: rgba(236, 238, 232, .92);
+  --card: #FBFBF7;
+  --pc-bg: #DCE1D4;
+  --pc-fog: rgba(251, 251, 247, .74);
+  --pc-board: #E4DCC9;
+  --card-shadow: 0 1px 2px rgba(26, 32, 22, .08), 0 16px 32px -14px rgba(26, 32, 22, .38);
+  --card-shadow-up: 0 2px 4px rgba(26, 32, 22, .08), 0 28px 46px -16px rgba(26, 32, 22, .44);
 
   /* Tipografía */
   --serif: 'Spectral', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
@@ -71,6 +77,12 @@
     --scrim: rgba(0, 0, 0, .55);
     --water: #6A938D;
     --water-glint: rgba(226, 229, 218, .8);
+    --card: #23291F;
+    --pc-bg: #2C3428;
+    --pc-fog: rgba(226, 229, 218, .16);
+    --pc-board: #4A402F;
+    --card-shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 18px 36px -14px rgba(0, 0, 0, .75);
+    --card-shadow-up: 0 2px 4px rgba(0, 0, 0, .4), 0 30px 50px -16px rgba(0, 0, 0, .8);
     color-scheme: dark;
   }
 }
@@ -91,6 +103,12 @@
   --scrim: rgba(0, 0, 0, .55);
   --water: #6A938D;
   --water-glint: rgba(226, 229, 218, .8);
+  --card: #23291F;
+  --pc-bg: #2C3428;
+  --pc-fog: rgba(226, 229, 218, .16);
+  --pc-board: #4A402F;
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 18px 36px -14px rgba(0, 0, 0, .75);
+  --card-shadow-up: 0 2px 4px rgba(0, 0, 0, .4), 0 30px 50px -16px rgba(0, 0, 0, .8);
   color-scheme: dark;
 }
 
@@ -126,7 +144,7 @@ em { font-style: italic; }
 .icon { width: 1.05em; height: 1.05em; flex: none; }
 html.motion-pending .site-header, html.motion-pending [data-intro], html.motion-pending [data-intro-title],
 html.motion-pending .hero__art, html.motion-pending [data-split], html.motion-pending [data-reveal],
-html.motion-pending [data-reveal-group] > * { visibility: hidden; }
+html.motion-pending [data-reveal-group] > *, html.motion-pending .postcard { visibility: hidden; }
 
 /* Sin JavaScript: fuera lo que no puede funcionar */
 .no-js button.menu-toggle, .no-js .cal-scroll, .no-js .cal__legend, .no-js .finca__land, .no-js .recipe-tools { display: none; }
@@ -562,6 +580,82 @@ html.dialog-open { overflow: hidden; scrollbar-gutter: stable; }
 /* La máscara deja aire para descendentes y cursivas */
 .split-line-mask { padding: 0 .14em .14em; margin: 0 -.14em -.14em; }
 
+/* ---------- Postales para fotos ----------
+   Papel con borde blanco y sombra suave, rectas o algo giradas. Sin foto, llevan una lámina de relleno;
+   con foto (config.js), la foto la sustituye y se recorta para llenar el hueco. */
+.postcard { --rot: 0deg; position: relative; align-self: start; margin: 0; width: 100%; max-width: 268px; padding: 10px 10px 0; background: var(--card); box-shadow: var(--card-shadow); transform: rotate(var(--rot)); transition: transform .7s var(--ease), box-shadow .7s var(--ease); }
+.postcard--tilt-l { --rot: -2.6deg; }
+.postcard--tilt-r { --rot: 2.1deg; }
+.postcard--tilt-s { --rot: -1.2deg; }
+.postcard__photo { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--pc-bg); }
+.postcard--portrait .postcard__photo { aspect-ratio: 4 / 5; }
+.postcard__photo > svg, .postcard__photo > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
+.postcard__photo > img { object-fit: cover; }
+.postcard.has-photo .pc-art { display: none; }
+.postcard__cap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 2px 12px; font: 400 italic .95rem/1.3 var(--serif); color: var(--muted); }
+.postcard__mark { width: 15px; height: 15px; flex: none; fill: currentColor; opacity: .7; }
+@media (hover: hover) { .postcard:hover { transform: rotate(0deg) translateY(-6px); box-shadow: var(--card-shadow-up); } }
+
+/* Láminas de relleno */
+.pc-bg { fill: var(--pc-bg); }
+.pc-line { fill: none; stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; opacity: .78; }
+.pc-fine { stroke-width: .6; opacity: .5; }
+.pc-soft { opacity: .38; }
+.pc-thick { stroke-width: 1.6; }
+.pc-leaf, .pc-hill { fill: var(--pc-bg); }
+.pc-tree { fill: var(--ink); opacity: .82; }
+.pc-tree--far { opacity: .45; }
+.pc-water { fill: var(--water); }
+.pc-glint { fill: none; stroke: var(--water-glint); stroke-width: .9; stroke-dasharray: 2 12; vector-effect: non-scaling-stroke; }
+.pc-fog { fill: var(--pc-fog); }
+.pc-dots { fill: none; stroke: var(--ink); stroke-width: 1.3; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .8; }
+.pc-dots--big { stroke-width: 1.9; }
+.pc-flesh { fill: var(--flesh); }
+.pc-skin { fill: none; stroke: var(--skin); stroke-width: 7; }
+.pc-pit { fill: var(--pit); }
+.pc-cavity { fill: var(--cavity); }
+.pc-board { fill: var(--pc-board); }
+.pc-grain { opacity: .25; }
+.pc-rain { stroke-width: .6; opacity: .45; }
+.pc-fruit { fill: var(--ink); opacity: .85; }
+.pc-salt { stroke-width: 1.4; opacity: .6; }
+
+/* Dónde va cada postal: en escritorio, en la columna libre de la izquierda */
+.finca__body, .guia__extra, .recetas__extra, .social__cards { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); align-items: start; }
+.guia__extra, .recetas__extra { margin-top: clamp(48px, 6vw, 80px); }
+.guia__extra .guia__more, .recetas__extra .recetas__tips { margin: 0; }
+.social__cards { margin-bottom: clamp(56px, 7vw, 96px); }
+.longread__cards { display: flex; flex-direction: column; gap: clamp(120px, 16vw, 300px); }
+@media (min-width: 961px) {
+  .nome .postcard { grid-column: 1 / 4; grid-row: 1; margin-top: .6em; }
+  .finca__body .postcard, .guia__extra .postcard, .recetas__extra .postcard { grid-column: 1 / 4; grid-row: 1; max-width: 232px; }
+  .finca__body .facts { grid-column: 4 / 13; grid-template-columns: repeat(9, minmax(0, 1fr)); }
+  .finca__body .facts > .fact { grid-column: span 3; }
+  .guia__extra .guia__more, .recetas__extra .recetas__tips { grid-column: 4 / 13; grid-row: 1; }
+  .longread__cards { grid-column: 1 / 4; grid-row: 1; padding-top: .4em; }
+  .longread__cards .postcard { max-width: 232px; }
+  .longread__cards .postcard:last-child { margin-left: 18px; }
+  .social__cards .postcard { grid-column: span 3; max-width: none; }
+  .social__cards .postcard:first-child { grid-column: 4 / 7; }
+  .social__cards .postcard:nth-child(2) { margin-top: 36px; }
+  .social__cards .postcard:nth-child(3) { margin-top: 10px; }
+}
+/* En móvil y tableta: entre los textos, centradas; las de Síguenos, en abanico */
+@media (max-width: 960px) {
+  .nome .postcard, .finca__body .postcard, .guia__extra .postcard, .recetas__extra .postcard { grid-column: 1 / -1; justify-self: center; max-width: min(300px, 78%); margin-block: 8px 48px; }
+  .finca__body .facts, .guia__extra .guia__more, .recetas__extra .recetas__tips { grid-column: 1 / -1; }
+  .nome .postcard { margin-block: 48px 0; }
+  .longread__cards { grid-column: 1 / -1; flex-direction: row; justify-content: center; align-items: flex-start; gap: 18px; margin-bottom: 48px; }
+  .longread__cards .postcard { max-width: 46%; padding: 7px 7px 0; }
+  .longread__cards .postcard:last-child { margin-top: 28px; }
+  .social__cards { display: flex; justify-content: center; align-items: flex-start; padding-inline: 4%; }
+  .social__cards .postcard { width: 40%; flex: none; padding: 7px 7px 0; }
+  .social__cards .postcard + .postcard { margin-left: -9%; }
+  .social__cards .postcard:nth-child(2) { margin-top: 26px; z-index: 1; }
+  .longread__cards .postcard__cap, .social__cards .postcard__cap { font-size: .8rem; padding: 7px 1px 9px; }
+  .longread__cards .postcard__mark, .social__cards .postcard__mark { display: none; }
+}
+
 /* ---------- Bloques de texto añadidos: portada, cifras, finca, variedades, guía, recetario, nutrición, síguenos ---------- */
 /* Portada: segundo párrafo bajo la entradilla */
 .hero__text { max-width: 34em; color: var(--muted); text-wrap: pretty; }
@@ -576,9 +670,7 @@ html.dialog-open { overflow: hidden; scrollbar-gutter: stable; }
 
 /* ---------- La finca: seis hechos en dos filas de tres ---------- */
 .finca .facts { row-gap: clamp(36px, 4vw, 56px); }
-@media (min-width: 961px) {
-  .finca .fact:nth-child(3n+1) { grid-column: 4 / 7; }
-}
+
 /* Variedades: notas bajo las fichas */
 .variedades__notes { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); row-gap: clamp(32px, 4vw, 48px); margin-top: clamp(56px, 7vw, 104px); }
 .variedades__note { grid-column: 4 / 11; display: grid; align-content: start; gap: 10px; padding-top: 22px; border-top: 1px solid var(--line); }
@@ -712,7 +804,8 @@ html.dialog-open { overflow: hidden; scrollbar-gutter: stable; }
 
 /* ---------- Impresión: todo visible ---------- */
 @media print {
-  [data-reveal], [data-reveal-group] > *, html.motion-pending * { opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  [data-reveal], [data-reveal-group] > *, .postcard, html.motion-pending * { opacity: 1 !important; visibility: visible !important; }
+  [data-reveal], [data-reveal-group] > * { transform: none !important; }
   .split-line { transform: none !important; }
   .site-header, .menu-toggle, .recipe-tools { display: none !important; }
 }

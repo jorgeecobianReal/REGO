@@ -441,6 +441,27 @@
   }
 
   /* ------------------------------------------------------------------
+     Postales: si config.js trae una foto para una postal, va dentro y se
+     recorta para llenar el hueco; si no, se queda la lámina de relleno.
+     ------------------------------------------------------------------ */
+  function initPostcards() {
+    var fotos = C.fotos || {};
+    $$('.postcard[data-photo]').forEach(function (card) {
+      var v = fotos[card.getAttribute('data-photo')];
+      var src = v && (typeof v === 'string' ? v : v.src);
+      if (!src) return;
+      var img = document.createElement('img');
+      img.alt = (typeof v === 'object' && v.alt) || card.getAttribute('data-alt') || '';
+      img.decoding = 'async';
+      img.loading = 'lazy';
+      img.addEventListener('load', function () { card.classList.add('has-photo'); });
+      img.addEventListener('error', function () { img.parentNode && img.parentNode.removeChild(img); });
+      img.src = src;
+      $('.postcard__photo', card).appendChild(img);
+    });
+  }
+
+  /* ------------------------------------------------------------------
      4. Guía de maduración
      ------------------------------------------------------------------ */
   function initRipeness() {
@@ -834,6 +855,15 @@
       onEnter(land, function () { tl.play(); }, 'top 78%');
     }
 
+    // Postales: se posan girando un poco, como al dejarlas sobre la mesa
+    $$('.postcard').forEach(function (card) {
+      var rot = parseFloat(getComputedStyle(card).getPropertyValue('--rot')) || 0;
+      gsap.set(card, { opacity: 0, y: 40, rotation: rot + (rot < 0 ? -7 : 7) });
+      onEnter(card, function () {
+        gsap.to(card, { opacity: 1, y: 0, rotation: rot, duration: 1.4, ease: 'power3.out', clearProps: 'transform,opacity' });
+      }, 'top 92%');
+    });
+
     // Cifras: cuentan una vez
     $$('[data-count]').forEach(function (el) {
       var target = Number(el.getAttribute('data-count'));
@@ -870,6 +900,7 @@
   stipple();
   contours();
   windGo = initWind();
+  initPostcards();
   initRipeness();
   initRecipes();
   initMenu();

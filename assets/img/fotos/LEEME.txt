@@ -1,0 +1,9 @@
+Fotos de las postales de la web
+
+1. Copia aquí las fotos (JPG o WebP, unos 800 px de ancho bastan).
+2. En assets/js/config.js, dentro de "fotos", escribe la ruta de cada una.
+   Ejemplo: rego: 'assets/img/fotos/rego.jpg'
+
+Las postales marcadas como verticales en config.js quedan mejor con fotos
+verticales; las demás, con fotos apaisadas. La foto se recorta sola para
+llenar la postal.

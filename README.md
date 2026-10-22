@@ -12,6 +12,7 @@ Sobrio y editorial, pensado como un cuaderno de campo:
 - **Modo oscuro** automático según el sistema del visitante, con los mismos tonos en versión noche.
 - **Tipografías**: Spectral (titulares y textos largos) y Hanken Grotesk (texto de apoyo y etiquetas). Van dentro del proyecto, sin peticiones a Google Fonts.
 - **Ilustraciones** de línea como láminas botánicas numeradas: el aguacate en su rama, el corte longitudinal con sus partes, las dos variedades, la ladera con socalcos y el rego. Son SVG ligeros; el punteado de grabado y el paisaje se generan al cargar.
+- **Postales para fotos**: nueve postales rectangulares con borde de papel y sombra suave, rectas o un poco giradas, colocadas en los huecos de la izquierda de las secciones y en Síguenos. Mientras no tienen foto muestran un dibujo de línea del mismo estilo que las láminas; al bajar se posan con un pequeño giro.
 - **Rejilla de 12 columnas**: titulares y textos arrancan en la cuarta columna y dejan un margen amplio a la izquierda; sin etiquetas pequeñas sobre las secciones.
 - **Marca**: junto al nombre, en la cabecera, va el árbol del logo de la finca redibujado en silueta limpia: copa ancha de pino piñonero, un piso más pequeño a la derecha y tronco alto y fino. El icono de la pestaña lo usa en crema sobre el verde oliva del logo.
 
@@ -77,6 +78,31 @@ window.REGO_CONFIG = {
 - Si se añaden enlaces en `tiktokVideos`, la web los incrusta debajo de los enlaces de Síguenos.
 - `temporada` admite cualquier variedad y cualquier lista de meses. El calendario, la frase de temporada, el dato "Ahora" de la portada y las fichas de variedades se actualizan solos.
 
+## Poner fotos en las postales
+
+1. Copia las fotos en `assets/img/fotos/` (JPG o WebP; con unos 800 px de ancho basta).
+2. En `assets/js/config.js`, dentro de `fotos`, escribe la ruta de cada una:
+
+```js
+fotos: {
+  rego: 'assets/img/fotos/rego.jpg',
+  socalcos: { src: 'assets/img/fotos/terrazas.jpg', alt: 'Terrazas con aguacateros' },
+  ...
+}
+```
+
+| Clave | Dónde está la postal | Formato que mejor encaja |
+|---|---|---|
+| `rego` | O nome | Apaisada |
+| `socalcos` | La finca | Vertical |
+| `colleita` | Aguacate de aquí | Vertical |
+| `bretema` | Aguacate de aquí | Apaisada |
+| `punto` | Guía | Vertical |
+| `cocina` | Recetario | Apaisada |
+| `orballo`, `costa`, `aguacateiro` | Síguenos | Apaisada |
+
+La foto se recorta sola para llenar la postal. Si una ruta está mal o la foto no existe, la postal sigue mostrando su dibujo. El texto alternativo se toma de `alt` si se indica; si no, de la descripción que lleva cada postal en `index.html`.
+
 ## Añadir o cambiar recetas
 
 Las recetas están en `assets/js/recetas.js`. Cada receta es un bloque con categoría, título, tiempo, raciones, dificultad, variedad, ingredientes, pasos y un consejo. Para añadir una, se copia un bloque, se cambia el `id` y se rellenan los campos. Los filtros y la ficha se actualizan solos.
@@ -118,6 +144,7 @@ assets/js/main.js       Interacción, punteado, paisaje y animaciones
 assets/fonts/           Spectral y Hanken Grotesk (WOFF2) con sus licencias
 assets/vendor/          GSAP y plugins
 assets/img/             Favicon e imagen para redes
+assets/img/fotos/       Fotos de las postales (ver config.js)
 ```
 
 La versión anterior, con el aguacate 3D, queda guardada en el historial de git (commit «Escena 3D: última versión de la apertura antes de retirarla»).
