@@ -310,8 +310,30 @@ html.menu-open .site-header { background: var(--bg); transform: none; }
 /* ---------- O nome ---------- */
 .nome__body { grid-column: 4 / 13; display: grid; gap: clamp(28px, 3.5vw, 48px); }
 .nome__text { font: 300 clamp(1.6rem, 1.15rem + 1.9vw, 2.75rem)/1.28 var(--serif); letter-spacing: -.01em; max-width: 26em; text-wrap: pretty; }
-.rego-line { width: 100%; height: 26px; color: var(--accent); }
-.rego-line path { fill: none; stroke: currentColor; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.rego-band { display: block; width: 100%; height: auto; aspect-ratio: 900 / 160; overflow: hidden; color: var(--ink); }
+/* En móvil, solo el tramo central (con las poldras) y más grande */
+@media (max-width: 640px) { .rego-band { aspect-ratio: auto; height: 132px; } }
+.rb-bank, .rb-grass { fill: none; stroke: var(--ink); stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.rb-bank { stroke-width: .8; opacity: .42; }
+.rb-grass { stroke-width: .75; opacity: .55; }
+.rb-stone { fill: var(--bg); stroke: var(--ink); stroke-width: .7; opacity: .7; vector-effect: non-scaling-stroke; }
+.rb-water, .rb-source { fill: var(--water); }
+.rb-ripple { fill: none; stroke: var(--water); stroke-width: .8; stroke-linecap: round; opacity: .7; vector-effect: non-scaling-stroke; }
+.rb-poldra { fill: var(--pc-bg); opacity: .95; }
+.rb-tree { fill: var(--ink); opacity: .8; }
+.rb-head { fill: var(--ink); opacity: .55; }
+.rb-axis { fill: none; stroke: none; }
+.rb-flow { fill: none; stroke: var(--water-glint); stroke-linecap: round; }
+.rb-flow--a { stroke-width: 1.3; stroke-dasharray: 3 21.5; animation: rego-flow-a 2.8s linear infinite; }
+.rb-flow--b { stroke-width: .8; stroke-dasharray: 1.2 15; stroke-dashoffset: 7; opacity: .75; animation: rego-flow-b 1.9s linear infinite; }
+.rego-band:not(.is-live) .rb-flow { animation-play-state: paused; }
+.rb-leaf { opacity: 0; }
+.rb-leaf__blade { fill: var(--pc-bg); stroke: var(--ink); stroke-width: .8; vector-effect: non-scaling-stroke; }
+.rb-leaf__rib { fill: none; stroke: var(--ink); stroke-width: .6; opacity: .7; vector-effect: non-scaling-stroke; }
+@media (prefers-reduced-motion: reduce) {
+  .rb-flow { animation: none !important; }
+  .rb-leaf { display: none; }
+}
 .entry { display: grid; grid-template-columns: auto 1fr; gap: 8px 40px; align-items: baseline; max-width: 44em; }
 .entry__word { font: 400 italic 1.5rem/1 var(--serif); }
 .entry__word span { font: 400 .8rem/1 var(--sans); font-style: normal; color: var(--muted); margin-left: .4em; letter-spacing: .02em; }

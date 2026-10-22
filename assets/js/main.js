@@ -441,6 +441,48 @@
   }
 
   /* ------------------------------------------------------------------
+     Rego de O nome: una hoja de aguacate baja flotando, meciéndose con la
+     corriente. Solo mientras se ve; quieta con "reducir movimiento".
+     ------------------------------------------------------------------ */
+  var regoLeafGo = null;
+  function initRegoBand() {
+    var svg = $('[data-rego-band]');
+    if (!svg) return null;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (en) { svg.classList.toggle('is-live', en[0].isIntersecting); run(); }).observe(svg);
+    } else {
+      svg.classList.add('is-live');
+    }
+    var axis = $('.rb-axis', svg), leaves = $$('.rb-leaf', svg);
+    if (reduce || !axis || !leaves.length || !axis.getTotalLength) return null;
+    var len = axis.getTotalLength(), dur = 19, clock = 0, last = 0, raf = 0, running = false, started = false;
+    var frame = function (now) {
+      var dt = Math.min(.05, (now - last) / 1000 || 0);
+      last = now;
+      clock += dt;
+      // Dos hojas a ritmos distintos; la corriente es más rápida aguas abajo, donde el cauce es más ancho
+      leaves.forEach(function (leaf, i) {
+        var t = clock * (1 - i * .18) + i * dur * .52;
+        var k = (t % dur) / dur;
+        var d = len * (k * .55 + k * k * .45);
+        var p = axis.getPointAtLength(d), q = axis.getPointAtLength(Math.min(len, d + 3));
+        var ang = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI + Math.sin(t * 1.7 + i) * 10;
+        leaf.setAttribute('transform', 'translate(' + p.x.toFixed(1) + ' ' + (p.y + Math.sin(t * 2.3) * .9).toFixed(1) + ') rotate(' + ang.toFixed(1) + ')');
+        leaf.style.opacity = Math.max(0, Math.min(1, k * 10, (1 - k) * 10));
+      });
+      raf = requestAnimationFrame(frame);
+    };
+    function run() {
+      var on = started && svg.classList.contains('is-live') && !document.hidden;
+      if (on === running) return;
+      running = on;
+      if (on) { last = performance.now(); raf = requestAnimationFrame(frame); } else cancelAnimationFrame(raf);
+    }
+    document.addEventListener('visibilitychange', run);
+    return function () { started = true; run(); };
+  }
+
+  /* ------------------------------------------------------------------
      Postales: si config.js trae una foto para una postal, va dentro y se
      recorta para llenar el hueco; si no, se queda la lámina de relleno.
      ------------------------------------------------------------------ */
@@ -836,10 +878,17 @@
       var tw = gsap.from(drawn(svg), { drawSVG: 0, duration: 1.4, stagger: .08, ease: 'power2.inOut', paused: true, delay: (i % 5) * .08 });
       onEnter(svg, function () { tw.play(); });
     });
-    var rego = $('.rego-line');
-    if (rego) {
-      var tr = gsap.from(drawn(rego), { drawSVG: 0, duration: 2.4, ease: 'power2.inOut', paused: true });
-      onEnter(rego, function () { tr.play(); });
+    // Rego de O nome: orillas, agua que llena el cauce, hierba que brota y, al final, la hoja
+    var band = $('[data-rego-band]');
+    if (band) {
+      var tb = gsap.timeline({ paused: true });
+      tb.from($$('.rb-bank', band), { drawSVG: 0, duration: 1.8, ease: 'power2.inOut' })
+        .from($$('.rb-source', band), { scale: 0, transformOrigin: '50% 50%', duration: .6, ease: 'power3.out' }, .2)
+        .from($('.rb-reveal', band), { drawSVG: 0, duration: 2.6, ease: 'power1.inOut' }, .4)
+        .from($$('.rb-grass, .rb-heads, .rb-stones, .rb-ripple', band), { opacity: 0, duration: 1.2, ease: 'power1.out' }, 1.2)
+        .from($$('.rb-tree', band), { opacity: 0, y: 4, duration: 1, ease: 'power2.out' }, 1.5)
+        .call(function () { if (regoLeafGo) regoLeafGo(); }, null, 2.6);
+      onEnter(band, function () { tb.play(); }, 'top 88%');
     }
 
     // Paisaje: curvas de nivel, árboles y el rego
@@ -901,6 +950,8 @@
   contours();
   windGo = initWind();
   initPostcards();
+  regoLeafGo = initRegoBand();
+  if (regoLeafGo && !motion) regoLeafGo();
   initRipeness();
   initRecipes();
   initMenu();
