@@ -203,7 +203,18 @@
     return d;
   }
 
-  // Ladera con socalcos: curvas de nivel, filas de árboles y el rego bajando
+  // Lado de una cinta a partir de su eje: puntos desplazados por la normal
+  function offsetSide(pts, widths, sign) {
+    return pts.map(function (p, k) {
+      var a = pts[Math.max(0, k - 1)], b = pts[Math.min(pts.length - 1, k + 1)];
+      var dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1;
+      return [p[0] - dy / l * widths[k] / 2 * sign, p[1] + dx / l * widths[k] / 2 * sign];
+    });
+  }
+
+  // Ladera con socalcos: curvas de nivel, filas de árboles y el rego.
+  // El rego nace en la vaguada entre las dos lomas y baja la ladera ensanchándose;
+  // las curvas de nivel se pliegan en "V" hacia arriba al cruzarlo, como en un mapa.
   function contours() {
     var svg = $('[data-contours]');
     if (!svg) return;
@@ -212,7 +223,7 @@
     var bump = function (x, cx, w) { var t = (x - cx) / w; return Math.exp(-t * t); };
     var ph = [rnd() * 6, rnd() * 6, rnd() * 6];
     // Una loma grande a la izquierda y otra menor a la derecha; las curvas bajas se aplanan
-    var profile = function (x, i) {
+    var base = function (x, i) {
       var k = i / (N - 1);
       return 150 + i * 21
         - (112 - k * 92) * bump(x, 560, 360 + k * 260)
@@ -220,27 +231,72 @@
         + Math.sin(x * .004 + ph[0] + i * .35) * 6
         + Math.sin(x * .011 + ph[1] - i * .2) * 2.5;
     };
-    var out = '<g class="c-lines">';
+
+    // Eje del rego: nace junto a la curva más alta y serpentea hacia abajo y a la izquierda
+    var x0 = 930, y0 = base(x0, 0) + 6, yEnd = 412;
+    var streamX = function (y) { var d = y - y0; return x0 - d * .3 + Math.sin(d / 30) * (4 + d * .055); };
+    var cross = [];
     for (var i = 0; i < N; i++) {
-      var pts = [];
-      for (var x = -40; x <= W + 40; x += 40) pts.push([x, profile(x, i)]);
+      var cx = streamX(base(x0, i));
+      cx = streamX(base(cx, i));
+      cross.push(base(cx, i) > y0 + 4 ? cx : null);
+    }
+    var profile = function (x, i) {
+      if (cross[i] === null) return base(x, i);
+      var t = (x - cross[i]) / (13 + i * 1.1);
+      return base(x, i) - (5 + i * .75) * Math.exp(-t * t);
+    };
+
+    var out = '<defs><mask id="rego-reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="' + W + '" height="440">' +
+      '<path class="c-reveal" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" d="__AXIS__"/></mask></defs>';
+    out += '<g class="c-lines">';
+    for (i = 0; i < N; i++) {
+      // Más puntos cerca del cauce para que la "V" salga limpia
+      var xs = [];
+      for (var x = -40; x <= W + 40; x += 40) xs.push(x);
+      if (cross[i] !== null) for (var xx = cross[i] - 64; xx <= cross[i] + 64; xx += 8) xs.push(xx);
+      xs.sort(function (m, n) { return m - n; });
+      var pts = xs.filter(function (v, k) { return k === 0 || v - xs[k - 1] > 4; }).map(function (v) { return [v, profile(v, i)]; });
       out += '<path class="c-line" vector-effect="non-scaling-stroke" d="' + smoothPath(pts) + '"/>';
     }
     out += '</g><g class="c-trees">';
     for (var r = 2; r < N - 2; r += 2) {
       for (var tx = 300 + (r % 4) * 9; tx < 860; tx += 28) {
+        if (cross[r] !== null && Math.abs(tx - cross[r]) < 30) continue;
         var ty = profile(tx, r) - 4.2;
         out += '<circle class="c-tree" cx="' + tx.toFixed(1) + '" cy="' + ty.toFixed(1) + '" r="2.6"/>';
       }
     }
     out += '</g>';
-    var rego = [];
-    for (var s = 0; s <= 12; s++) {
-      var yy = profile(960, 0) - 6 + s * 22;
-      rego.push([968 - s * 18 + Math.sin(s * 1.25) * 22, yy]);
+
+    // Cauce: cinta que pasa de un hilo a unos 4 px; el agua corre por encima en destellos
+    var axis = [], widths = [];
+    for (var y = y0; y <= yEnd; y += 3) {
+      var t = (y - y0) / (yEnd - y0);
+      axis.push([streamX(y), y]);
+      widths.push(.6 + 4.8 * Math.pow(t, .8));
     }
-    out += '<path class="c-rego" vector-effect="non-scaling-stroke" d="' + smoothPath(rego) + '"/>';
-    svg.innerHTML = out;
+    var left = offsetSide(axis, widths, 1), right = offsetSide(axis, widths, -1).reverse();
+    var ribbon = smoothPath(left) + 'L' + smoothPath(right).slice(1) + 'Z';
+    var lower = axis.slice(Math.round(axis.length * .16));
+    var axisD = smoothPath(axis);
+    out += '<g class="c-stream" mask="url(#rego-reveal)">' +
+      '<path class="c-rego" d="' + ribbon + '"/>' +
+      '<path class="c-flow c-flow--a" d="' + smoothPath(lower) + '"/>' +
+      '<path class="c-flow c-flow--b" d="' + smoothPath(lower) + '"/>' +
+      '</g>';
+    // Manantial: un punto y dos ondas que se abren despacio
+    var sx = axis[0][0].toFixed(1), sy = (y0 - 1).toFixed(1);
+    out += '<g class="c-spring"><circle class="c-ring" cx="' + sx + '" cy="' + sy + '" r="3"/><circle class="c-ring c-ring--2" cx="' + sx + '" cy="' + sy + '" r="3"/>' +
+      '<circle class="c-source" cx="' + sx + '" cy="' + sy + '" r="1.7"/></g>';
+    svg.innerHTML = out.replace('__AXIS__', axisD);
+
+    // El agua solo corre mientras la lámina está a la vista
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (en) { svg.classList.toggle('is-live', en[0].isIntersecting); }).observe(svg);
+    } else {
+      svg.classList.add('is-live');
+    }
   }
 
   /* ------------------------------------------------------------------
@@ -738,7 +794,9 @@
       var tl = gsap.timeline({ paused: true });
       tl.from($$('.c-line', land), { drawSVG: 0, duration: 2, stagger: .07, ease: 'power2.inOut' })
         .from($$('.c-tree', land), { scale: 0, transformOrigin: '50% 50%', duration: .6, stagger: { each: .006, from: 'random' }, ease: 'power3.out' }, .9)
-        .from($$('.c-rego', land), { drawSVG: 0, duration: 2.2, ease: 'power2.inOut' }, 1.2);
+        .from($$('.c-source', land), { scale: 0, transformOrigin: '50% 50%', duration: .8, ease: 'power3.out' }, 1)
+        .from($$('.c-ring', land), { autoAlpha: 0, duration: .6 }, 1.2)
+        .from($$('.c-reveal', land), { drawSVG: 0, duration: 3.4, ease: 'power1.inOut' }, 1.2);
       onEnter(land, function () { tl.play(); }, 'top 78%');
     }
 

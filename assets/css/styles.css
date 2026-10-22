@@ -29,6 +29,8 @@
   --cavity: #C9CF8E;
   --scrim: rgba(26, 32, 22, .38);
   --ripe-dots: rgba(0, 0, 0, .42);
+  --water: #4C716C;
+  --water-glint: rgba(236, 238, 232, .92);
 
   /* Tipografía */
   --serif: 'Spectral', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
@@ -67,6 +69,8 @@
     --pit-light: #AE7550;
     --cavity: #A9B070;
     --scrim: rgba(0, 0, 0, .55);
+    --water: #6A938D;
+    --water-glint: rgba(226, 229, 218, .8);
     color-scheme: dark;
   }
 }
@@ -85,6 +89,8 @@
   --pit-light: #AE7550;
   --cavity: #A9B070;
   --scrim: rgba(0, 0, 0, .55);
+  --water: #6A938D;
+  --water-glint: rgba(226, 229, 218, .8);
   color-scheme: dark;
 }
 
@@ -316,7 +322,22 @@ html.menu-open .site-header { background: var(--bg); transform: none; }
 .contours { width: 100%; height: clamp(220px, 27.78vw, 540px); color: var(--ink); }
 .contours .c-line { fill: none; stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; opacity: .55; }
 .contours .c-line:nth-child(3n) { opacity: .3; }
-.contours .c-rego { fill: none; stroke: var(--accent); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+.contours .c-rego { fill: var(--water); }
+/* Destellos que bajan con el agua: dos ritmos para que no parezca una cinta */
+.contours .c-flow { fill: none; stroke: var(--water-glint); stroke-linecap: round; }
+.contours .c-flow--a { stroke-width: 1.4; stroke-dasharray: 3 21.5; animation: rego-flow-a 2.6s linear infinite; }
+.contours .c-flow--b { stroke-width: .9; stroke-dasharray: 1.2 15; stroke-dashoffset: 7; opacity: .75; animation: rego-flow-b 1.8s linear infinite; }
+.contours .c-source { fill: var(--water); }
+.contours .c-ring { fill: none; stroke: var(--water); stroke-width: .8; transform-box: fill-box; transform-origin: center; opacity: 0; animation: rego-ring 3.8s ease-out infinite; }
+.contours .c-ring--2 { animation-delay: 1.9s; }
+.contours:not(.is-live) .c-flow, .contours:not(.is-live) .c-ring { animation-play-state: paused; }
+@keyframes rego-flow-a { to { stroke-dashoffset: -24.5; } }
+@keyframes rego-flow-b { from { stroke-dashoffset: 7; } to { stroke-dashoffset: -9.2; } }
+@keyframes rego-ring { 0% { transform: scale(.5); opacity: .7; } 100% { transform: scale(2.8); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .contours .c-flow, .contours .c-ring { animation: none !important; }
+  .contours .c-ring { display: none; }
+}
 .contours .c-tree { fill: var(--ink); }
 .finca__cap { display: flex; gap: .9em; align-items: baseline; justify-content: flex-end; margin-top: 14px; font: 400 .82rem/1.4 var(--serif); color: var(--muted); }
 .facts { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); }
@@ -540,6 +561,45 @@ html.dialog-open { overflow: hidden; scrollbar-gutter: stable; }
 /* ---------- Animación: líneas de titulares ---------- */
 /* La máscara deja aire para descendentes y cursivas */
 .split-line-mask { padding: 0 .14em .14em; margin: 0 -.14em -.14em; }
+
+/* ---------- Bloques de texto añadidos: portada, cifras, finca, variedades, guía, recetario, nutrición, síguenos ---------- */
+/* Portada: segundo párrafo bajo la entradilla */
+.hero__text { max-width: 34em; color: var(--muted); text-wrap: pretty; }
+
+/* O nome: texto que desarrolla el nombre */
+.nome__more { display: grid; gap: 1em; max-width: 36em; font: 400 1.16rem/1.72 var(--serif); text-wrap: pretty; }
+@media (max-width: 640px) { .nome__more { font-size: 1.08rem; } }
+/* ---------- Cifras: seis cifras en dos filas de tres ---------- */
+@media (min-width: 961px) {
+  .cifras .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: clamp(40px, 4.5vw, 64px); }
+}
+
+/* ---------- La finca: seis hechos en dos filas de tres ---------- */
+.finca .facts { row-gap: clamp(36px, 4vw, 56px); }
+@media (min-width: 961px) {
+  .finca .fact:nth-child(3n+1) { grid-column: 4 / 7; }
+}
+/* Variedades: notas bajo las fichas */
+.variedades__notes { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); row-gap: clamp(32px, 4vw, 48px); margin-top: clamp(56px, 7vw, 104px); }
+.variedades__note { grid-column: 4 / 11; display: grid; align-content: start; gap: 10px; padding-top: 22px; border-top: 1px solid var(--line); }
+.variedades__note h3 { font: 400 var(--t-h3)/1.2 var(--serif); }
+.variedades__note p { color: var(--muted); max-width: 40em; text-wrap: pretty; }
+/* Temporada: bloques bajo el calendario */
+.temporada .facts { margin-top: clamp(56px, 7vw, 96px); }
+@media (max-width: 960px) { .variedades__note { grid-column: 1 / -1; } }
+/* ---------- Consejos en dos columnas (guía y recetario) y nota de nutrición ---------- */
+.guia__more, .recetas__tips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gap); margin-top: clamp(48px, 6vw, 80px); }
+.guia__more .tip:last-child, .recetas__tips .tip:last-child { border-bottom: 0; }
+.nutri__kj { font: 400 .82rem/1 var(--sans); color: var(--muted); }
+@media (min-width: 961px) {
+  .guia__more, .recetas__tips, .nutri .note { margin-left: calc(25% + var(--gap) / 4); }
+}
+@media (max-width: 640px) {
+  .guia__more, .recetas__tips { grid-template-columns: 1fr; }
+}
+/* Síguenos: texto bajo la entradilla */
+.head .social__text { grid-column: 4 / 10; color: var(--muted); max-width: 36em; text-wrap: pretty; }
+@media (max-width: 960px) { .head .social__text { grid-column: 1 / -1; } }
 
 /* ---------- Variedades y guía alineadas con la columna 4 ---------- */
 @media (min-width: 1101px) {

@@ -25,7 +25,7 @@ Discretas y de una sola vez. Nada secuestra el scroll ni se queda fijo en pantal
 | Titulares de sección | Suben línea a línea desde una máscara al entrar en pantalla |
 | Textos y bloques | Suben unos píxeles y aparecen, con un pequeño escalonado en las listas |
 | Láminas e iconos | Se dibujan al llegar; en el corte, después del trazo entran la pulpa, la piel, el hueso y las llamadas numeradas |
-| La finca | Las curvas de nivel se trazan de izquierda a derecha, aparecen los árboles y baja el rego |
+| La finca | Las curvas de nivel se trazan de izquierda a derecha y se pliegan en «V» donde las cruza el rego, como en un mapa. Aparecen los árboles, late un pequeño manantial y el rego baja la ladera ensanchándose. Después el agua sigue corriendo con destellos mientras la lámina está a la vista |
 | Cifras y calendario | Los números cuentan hasta su valor y las barras de cosecha crecen mes a mes |
 | Interacción | Botones que se rellenan, filas de recetas que se desplazan al pasar el ratón, acordeón de preguntas, ventana de receta y menú móvil con transición suave |
 
@@ -40,7 +40,7 @@ Los bloques que aparecen al hacer scroll siguen disponibles para lectores de pan
 | O nome | Qué significa *rego* en gallego, con su entrada de diccionario |
 | Anatomía | Lámina del aguacate abierto con piel, pulpa y hueso explicados |
 | En cifras | Lluvia, meses en el árbol, kilómetros que no recorre y días de maduración |
-| La finca | Clima, agua y trabajo a mano, con la ladera de socalcos dibujada |
+| La finca | Clima, agua, suelo, viento, flores y trabajo a mano, con la ladera de socalcos y el rego dibujados |
 | Aguacate de aquí | Reportaje con letra capital, cita destacada y ficha lateral |
 | Del árbol al plato | Cinco pasos con iconos de línea |
 | Variedades | Hass y Bacon con su lámina y su ficha |
