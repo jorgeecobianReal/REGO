@@ -18,19 +18,20 @@ window.REGO_CONFIG = {
   // 'https://www.tiktok.com/@regodoscampos2/video/7300000000000000000'
   tiktokVideos: [],
 
-  // Fotos de las postales. Copia cada foto en assets/img/fotos/ y escribe aquí su ruta.
-  // Mientras una postal no tenga foto, muestra un dibujo de relleno.
-  // Admite la ruta sola o { src: 'ruta', alt: 'descripción de la foto' }.
+  // Fotos de las postales. Las nueve ya están puestas (assets/img/fotos/).
+  // Para cambiar una, lo más sencillo es sustituir su archivo por otro con el mismo nombre.
+  // También se puede escribir aquí la ruta de otra foto: la ruta sola o
+  // { src: 'ruta', alt: 'descripción de la foto' }. Vacío = se queda la foto actual.
   fotos: {
-    rego: '',          // O nome: el rego entre los campos
-    socalcos: '',      // La finca: las terrazas con los árboles (vertical)
-    colleita: '',      // Reportaje: aguacates en la rama o la cosecha (vertical)
-    bretema: '',       // Reportaje: la finca con niebla
-    punto: '',         // Guía: un aguacate maduro (vertical)
-    cocina: '',        // Recetario: el aguacate en la cocina
-    orballo: '',       // Síguenos: la finca bajo la lluvia
-    costa: '',         // Síguenos: el mar o la costa cercana
-    aguacateiro: ''    // Síguenos: un aguacatero con fruta
+    cartel: '',        // O nome: el cartel de la finca (cartel.webp)
+    balsa: '',         // La finca: la balsa con el pino (balsa.webp, vertical)
+    colleita: '',      // Aguacate de aquí: dos Hass en la rama (colleita.webp, vertical)
+    flor: '',          // Aguacate de aquí: la flor (flor.webp)
+    punto: '',         // Guía: un Hass en la rama (punto.webp, vertical)
+    cocina: '',        // Recetario: rama cargada de fruta (cocina.webp)
+    orballo: '',       // Síguenos: aguacates con llovizna (orballo.webp)
+    campos: '',        // Síguenos: filas de árboles y el pino (campos.webp)
+    aguacateiro: ''    // Síguenos: fila de aguacateros (aguacateiros.webp)
   },
 
   // Calendario orientativo de cosecha: variedad -> meses (1 = enero ... 12 = diciembre)

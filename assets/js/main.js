@@ -506,8 +506,9 @@
   }
 
   /* ------------------------------------------------------------------
-     Postales: si config.js trae una foto para una postal, va dentro y se
-     recorta para llenar el hueco; si no, se queda la lámina de relleno.
+     Postales: la foto va en index.html. Si config.js trae otra para una
+     postal, la sustituye; si esa ruta falla, vuelve la foto original (o el
+     dibujo de relleno, en una postal que no tenga foto).
      ------------------------------------------------------------------ */
   function initPostcards() {
     var fotos = C.fotos || {};
@@ -515,14 +516,22 @@
       var v = fotos[card.getAttribute('data-photo')];
       var src = v && (typeof v === 'string' ? v : v.src);
       if (!src) return;
-      var img = document.createElement('img');
-      img.alt = (typeof v === 'object' && v.alt) || card.getAttribute('data-alt') || '';
-      img.decoding = 'async';
-      img.loading = 'lazy';
-      img.addEventListener('load', function () { card.classList.add('has-photo'); });
-      img.addEventListener('error', function () { img.parentNode && img.parentNode.removeChild(img); });
+      var box = $('.postcard__photo', card);
+      var img = $('img', box), orig = img && img.getAttribute('src');
+      var alt = (typeof v === 'object' && v.alt) || (img && img.alt) || card.getAttribute('data-alt') || '';
+      if (!img) {
+        img = document.createElement('img');
+        img.decoding = 'async';
+        img.loading = 'lazy';
+        img.addEventListener('load', function () { card.classList.add('has-photo'); });
+        box.appendChild(img);
+      }
+      img.addEventListener('error', function () {
+        if (orig) { if (img.getAttribute('src') !== orig) img.src = orig; }
+        else if (img.parentNode) img.parentNode.removeChild(img);
+      });
+      img.alt = alt;
       img.src = src;
-      $('.postcard__photo', card).appendChild(img);
     });
   }
 

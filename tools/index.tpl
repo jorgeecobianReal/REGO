@@ -164,9 +164,9 @@
           </dd>
         </dl>
       </div>
-      <figure class="postcard postcard--tilt-l" data-photo="rego" data-alt="El rego que cruza la finca entre los campos">
-        <div class="postcard__photo">{{PC_REGO}}</div>
-        <figcaption class="postcard__cap"><span lang="gl">O rego, entre os campos</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
+      <figure class="postcard postcard--tilt-l" data-photo="cartel">
+        <div class="postcard__photo"><img src="assets/img/fotos/cartel.webp" alt="Cartel de madera de la finca, con el árbol del logo y el texto «Rego Dos Campos, finca agrícola»" width="800" height="600" loading="lazy" decoding="async"></div>
+        <figcaption class="postcard__cap"><span lang="gl">O noso nome</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
       </figure>
     </div>
   </section>
@@ -184,9 +184,9 @@
       <p class="finca__cap wrap"><span class="plate__n">Lám. II</span><span>Socalcos y rego, de memoria</span></p>
     </div>
     <div class="wrap finca__body">
-      <figure class="postcard postcard--portrait postcard--tilt-r" data-photo="socalcos" data-alt="Terrazas de la ladera con filas de aguacateros">
-        <div class="postcard__photo">{{PC_SOCALCOS}}</div>
-        <figcaption class="postcard__cap"><span lang="gl">Os socalcos da ladeira</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
+      <figure class="postcard postcard--portrait postcard--tilt-r" data-photo="balsa">
+        <div class="postcard__photo"><img src="assets/img/fotos/balsa.webp" alt="La balsa de agua de la finca, con un pino piñonero reflejado en la superficie" width="600" height="750" loading="lazy" decoding="async"></div>
+        <figcaption class="postcard__cap"><span lang="gl">A balsa</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
       </figure>
       <dl class="facts" data-reveal-group>
         <div class="fact">
@@ -225,13 +225,13 @@
       </header>
       <div class="longread__grid">
         <div class="longread__cards">
-          <figure class="postcard postcard--portrait postcard--tilt-r" data-photo="colleita" data-alt="Aguacates colgando de la rama antes de la cosecha">
-            <div class="postcard__photo">{{PC_COLLEITA}}</div>
-            <figcaption class="postcard__cap"><span lang="gl">Colleita a man</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
+          <figure class="postcard postcard--portrait postcard--tilt-r" data-photo="colleita">
+            <div class="postcard__photo"><img src="assets/img/fotos/colleita.webp" alt="Dos aguacates Hass colgando de la rama, al sol" width="600" height="750" loading="lazy" decoding="async"></div>
+            <figcaption class="postcard__cap"><span lang="gl">Antes da colleita</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
           </figure>
-          <figure class="postcard postcard--tilt-l" data-photo="bretema" data-alt="Niebla de la mañana sobre la finca">
-            <div class="postcard__photo">{{PC_BRETEMA}}</div>
-            <figcaption class="postcard__cap"><span lang="gl">Mañá de brétema</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
+          <figure class="postcard postcard--tilt-l" data-photo="flor">
+            <div class="postcard__photo"><img src="assets/img/fotos/flor.webp" alt="Racimos de flores y hojas nuevas, rojizas, de un aguacatero" width="800" height="600" loading="lazy" decoding="async"></div>
+            <figcaption class="postcard__cap"><span lang="gl">En flor</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
           </figure>
         </div>
         <div class="longread__body">
@@ -536,9 +536,9 @@
         </ul>
       </div>
       <div class="guia__extra">
-        <figure class="postcard postcard--portrait" data-photo="punto" data-alt="Un aguacate maduro, listo para abrir">
-          <div class="postcard__photo">{{PC_PUNTO}}</div>
-          <figcaption class="postcard__cap"><span lang="gl">No seu punto</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
+        <figure class="postcard postcard--portrait" data-photo="punto">
+          <div class="postcard__photo"><img src="assets/img/fotos/punto.webp" alt="Un aguacate Hass verde, todavía en la rama" width="600" height="750" loading="lazy" decoding="async"></div>
+          <figcaption class="postcard__cap"><span lang="gl">Aínda na póla</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
         </figure>
       <ul class="guia__more" data-reveal-group>
         <li class="tip">
@@ -587,9 +587,9 @@
       <p class="recetas__more">También compartimos recetas en <a data-social="instagram" href="https://www.instagram.com/regodoscampos/" target="_blank" rel="noopener">Instagram</a>.</p>
 
       <div class="recetas__extra">
-        <figure class="postcard postcard--tilt-r" data-photo="cocina" data-alt="Un aguacate abierto sobre la tabla de cocina">
-          <div class="postcard__photo">{{PC_COCINA}}</div>
-          <figcaption class="postcard__cap"><span lang="gl">Na cociña</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
+        <figure class="postcard postcard--tilt-r" data-photo="cocina">
+          <div class="postcard__photo"><img src="assets/img/fotos/cocina.webp" alt="Una rama de aguacatero cargada de aguacates Hass" width="800" height="600" loading="lazy" decoding="async"></div>
+          <figcaption class="postcard__cap"><span lang="gl">Da póla á cociña</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
         </figure>
       <ul class="recetas__tips" data-reveal-group>
         <li class="tip">
@@ -699,17 +699,17 @@
         <p class="social__text" data-reveal>En las redes se ve cómo recogemos el aguacate a mano y cómo miramos el árbol antes de decidir la cosecha. También salen los días de <em lang="gl">brétema</em> y nuestras recetas.</p>
       </header>
       <div class="social__cards">
-        <figure class="postcard postcard--tilt-l" data-photo="orballo" data-alt="Llovizna sobre las terrazas de la finca">
-          <div class="postcard__photo">{{PC_ORBALLO}}</div>
+        <figure class="postcard postcard--tilt-l" data-photo="orballo">
+          <div class="postcard__photo"><img src="assets/img/fotos/orballo.webp" alt="Aguacates Hass mojados por la llovizna, entre las hojas" width="800" height="600" loading="lazy" decoding="async"></div>
           <figcaption class="postcard__cap"><span lang="gl">Orballo na finca</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
         </figure>
-        <figure class="postcard postcard--tilt-r" data-photo="costa" data-alt="La costa atlántica al atardecer">
-          <div class="postcard__photo">{{PC_COSTA}}</div>
-          <figcaption class="postcard__cap"><span lang="gl">A costa</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
+        <figure class="postcard postcard--tilt-r" data-photo="campos">
+          <div class="postcard__photo"><img src="assets/img/fotos/campos.webp" alt="Filas de aguacateros jóvenes en la finca, con un pino piñonero al fondo" width="800" height="600" loading="lazy" decoding="async"></div>
+          <figcaption class="postcard__cap"><span lang="gl">Os nosos campos</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
         </figure>
-        <figure class="postcard postcard--tilt-s" data-photo="aguacateiro" data-alt="Un aguacatero cargado de fruta">
-          <div class="postcard__photo">{{PC_AGUACATEIRO}}</div>
-          <figcaption class="postcard__cap"><span lang="gl">O aguacateiro</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
+        <figure class="postcard postcard--tilt-s" data-photo="aguacateiro">
+          <div class="postcard__photo"><img src="assets/img/fotos/aguacateiros.webp" alt="Una fila de aguacateros bajo el cielo azul" width="800" height="600" loading="lazy" decoding="async"></div>
+          <figcaption class="postcard__cap"><span lang="gl">Os aguacateiros</span><svg class="postcard__mark" aria-hidden="true" focusable="false"><use href="#s-tree"/></svg></figcaption>
         </figure>
       </div>
       <ul class="handles" data-reveal-group>

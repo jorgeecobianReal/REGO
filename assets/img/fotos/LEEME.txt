@@ -1,9 +1,11 @@
 Fotos de las postales de la web
 
-1. Copia aquí las fotos (JPG o WebP, unos 800 px de ancho bastan).
-2. En assets/js/config.js, dentro de "fotos", escribe la ruta de cada una.
-   Ejemplo: rego: 'assets/img/fotos/rego.jpg'
+Cada postal tiene su foto en esta carpeta (WebP, ya recortada a su formato):
+cartel, balsa, colleita, flor, punto, cocina, orballo, campos y aguacateiros.
 
-Las postales marcadas como verticales en config.js quedan mejor con fotos
-verticales; las demás, con fotos apaisadas. La foto se recorta sola para
-llenar la postal.
+Para cambiar una foto, sustituye su archivo por otro con el mismo nombre.
+Formato: 800 x 600 px las apaisadas; 600 x 750 px las verticales
+(balsa, colleita y punto). Si la foto tiene otro formato, se recorta sola.
+
+También se puede indicar otra ruta en assets/js/config.js, dentro de "fotos".
+Los pies de foto están en tools/index.tpl (ver README.md).

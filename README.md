@@ -12,7 +12,7 @@ Sobrio y editorial, pensado como un cuaderno de campo:
 - **Modo oscuro** automático según el sistema del visitante, con los mismos tonos en versión noche.
 - **Tipografías**: Spectral (titulares y textos largos) y Hanken Grotesk (texto de apoyo y rótulos de datos). Van dentro del proyecto, sin peticiones a Google Fonts.
 - **Ilustraciones** de línea como láminas botánicas numeradas: el aguacate en su rama, la ladera con socalcos y el rego, el corte longitudinal con sus partes y las dos variedades. Son SVG ligeros; el punteado de grabado y el paisaje se generan al cargar.
-- **Postales para fotos**: nueve postales rectangulares con borde de papel y sombra suave, rectas o un poco giradas, colocadas en los huecos de la izquierda de las secciones y en Síguenos. Mientras no tienen foto muestran un dibujo de línea del mismo estilo que las láminas; al bajar se posan con un pequeño giro.
+- **Postales con fotos de la finca**: nueve postales rectangulares con borde de papel y sombra suave, rectas o un poco giradas, colocadas en los huecos de la izquierda de las secciones y en Síguenos. Cada una lleva una foto de la finca y un pie corto en gallego; al bajar se posan con un pequeño giro.
 - **Rejilla de 12 columnas**: titulares y textos arrancan en la cuarta columna y dejan un margen amplio a la izquierda. Sin etiquetas pequeñas en mayúsculas sobre las secciones ni sobre los títulos; solo quedan en mayúsculas los rótulos de datos (clima, cifras, meses, número de lámina).
 - **Marca**: junto al nombre, en la cabecera, va el árbol del logo de la finca redibujado en silueta limpia: copa ancha de pino piñonero, un piso más pequeño a la derecha y tronco alto y fino. El icono de la pestaña lo usa en crema sobre el verde oliva del logo.
 
@@ -44,7 +44,7 @@ Discretas. Las entradas ocurren una sola vez; el viento de la portada, el agua d
 | Sección | Contenido |
 |---|---|
 | Portada | Titular, presentación, enlaces al recetario y a Instagram, lámina del aguacate en su rama y cuatro datos rápidos (clima, variedades, temporada actual, cosecha) |
-| O nome | Qué significa *rego* en gallego, con el regato dibujado, su entrada de diccionario y una postal |
+| O nome | Qué significa *rego* en gallego, con el regato dibujado, su entrada de diccionario y la foto del cartel de la finca |
 | La finca | Clima, agua, suelo, viento, flores y trabajo a mano, con la ladera de socalcos y el rego dibujados (Lám. II) |
 | Aguacate de aquí | Reportaje con letra capital, cita destacada, dos postales y ficha lateral |
 | En cifras | Lluvia, años hasta la primera cosecha, flores que llegan a fruto, meses en el árbol, días de maduración y kilómetros que no recorre |
@@ -56,7 +56,7 @@ Discretas. Las entradas ocurren una sola vez; el viento de la portada, el agua d
 | Recetario | 13 recetas con filtros, buscador por ingrediente y ficha completa en ventana; cada receta tiene su enlace |
 | Nutrición | Cinco ideas clave y etiqueta nutricional por 100 g (USDA FoodData Central) |
 | Pequeno dicionario | Doce palabras gallegas del campo (*socalco*, *brétema*, *orballo*, *chuvia*, *leira*, *enxerto*, *colleita*, *sachar*, *eido*, *lentura*, *esterco* y *xeada*) |
-| Síguenos | Enlaces a Instagram (la cuenta principal, más destacada) y TikTok, con tres postales para fotos |
+| Síguenos | Enlaces a Instagram (la cuenta principal, más destacada) y TikTok, con tres fotos de la finca en postales |
 | Preguntas | Doce preguntas frecuentes, empezando por la aclaración de que la finca no vende |
 
 ## Tecnología
@@ -74,7 +74,7 @@ GSAP y sus plugins van en `assets/vendor/` y son gratuitos para uso comercial. L
 `index.html` se genera: no se edita a mano, porque el siguiente build lo sobrescribe.
 
 - Los textos y la estructura están en `tools/index.tpl`. Las láminas aparecen ahí como marcadores (`{{HERO}}`, `{{PC_REGO}}`…).
-- Las láminas salen de tres generadores: `tools/art.py` (aguacate, corte, variedades y guía), `tools/pc_art.py` (dibujos de las postales) y `tools/rego_band.py` (el regato de O nome). Cada uno escribe su `.json` en `tools/`.
+- Las láminas salen de tres generadores: `tools/art.py` (aguacate, corte, variedades y guía), `tools/rego_band.py` (el regato de O nome) y `tools/pc_art.py` (dibujos de relleno para postales sin foto). Cada uno escribe su `.json` en `tools/`.
 
 ```bash
 python3 tools/build.py              # tras cambiar textos en tools/index.tpl
@@ -92,7 +92,7 @@ window.REGO_CONFIG = {
   tiktok: 'regodoscampos2',
   instagram: 'regodoscampos',
   tiktokVideos: [],             // enlaces de vídeos para incrustar
-  fotos: { rego: '', ... },     // fotos de las postales (ver abajo)
+  fotos: { cartel: '', ... },   // cambiar fotos de las postales (ver abajo)
   temporada: { Hass: [12, 1, 2, 3, 4, 5], Bacon: [10, 11, 12, 1] }
 };
 ```
@@ -101,30 +101,29 @@ window.REGO_CONFIG = {
 - `temporada` admite cualquier variedad y cualquier lista de meses. El calendario, la frase de temporada, el dato «Ahora» de la portada y las fichas de variedades se actualizan solos.
 - Si `config.js` tiene un error (una coma o unas comillas de menos), la web no se rompe: el calendario se oculta, quedan los textos de temporada escritos en la página y la consola del navegador avisa.
 
-## Poner fotos en las postales
+## Fotos de las postales
 
-1. Copia las fotos en `assets/img/fotos/` (JPG o WebP; con unos 800 px de ancho basta).
-2. En `assets/js/config.js`, dentro de `fotos`, escribe la ruta de cada una:
+Las nueve postales llevan fotos de la finca, recortadas al formato de cada una y guardadas en WebP en `assets/img/fotos/` (de 30 a 120 KB cada una; se cargan al acercarse).
 
-```js
-fotos: {
-  rego: 'assets/img/fotos/rego.jpg',
-  socalcos: { src: 'assets/img/fotos/terrazas.jpg', alt: 'Terrazas con aguacateros' },
-  ...
-}
-```
+| Archivo | Clave en `config.js` | Dónde | Pie | Formato |
+|---|---|---|---|---|
+| `cartel.webp` | `cartel` | O nome | *O noso nome* | Apaisada |
+| `balsa.webp` | `balsa` | La finca | *A balsa* | Vertical |
+| `colleita.webp` | `colleita` | Aguacate de aquí | *Antes da colleita* | Vertical |
+| `flor.webp` | `flor` | Aguacate de aquí | *En flor* | Apaisada |
+| `punto.webp` | `punto` | Guía | *Aínda na póla* | Vertical |
+| `cocina.webp` | `cocina` | Recetario | *Da póla á cociña* | Apaisada |
+| `orballo.webp` | `orballo` | Síguenos | *Orballo na finca* | Apaisada |
+| `campos.webp` | `campos` | Síguenos | *Os nosos campos* | Apaisada |
+| `aguacateiros.webp` | `aguacateiro` | Síguenos | *Os aguacateiros* | Apaisada |
 
-| Clave | Dónde está la postal | Formato que mejor encaja |
-|---|---|---|
-| `rego` | O nome | Apaisada |
-| `socalcos` | La finca | Vertical |
-| `colleita` | Aguacate de aquí | Vertical |
-| `bretema` | Aguacate de aquí | Apaisada |
-| `punto` | Guía | Vertical |
-| `cocina` | Recetario | Apaisada |
-| `orballo`, `costa`, `aguacateiro` | Síguenos | Apaisada |
+Para cambiar una foto:
 
-La foto se recorta sola para llenar la postal. Si una ruta está mal o la foto no existe, la postal sigue mostrando su dibujo. El texto alternativo se toma de `alt` si se indica; si no, de la descripción que lleva cada postal en la plantilla.
+- **Lo más sencillo**: sustituir el archivo por otro con el mismo nombre (mejor ya recortado: 800 × 600 px las apaisadas, 600 × 750 px las verticales).
+- **O bien**, en `assets/js/config.js`, escribir la ruta de la nueva en su clave: `orballo: 'assets/img/fotos/lluvia.jpg'` o `{ src: '…', alt: 'descripción' }`. Si la ruta falla, vuelve la foto anterior.
+- El pie y la descripción para lectores de pantalla están en `tools/index.tpl`; si la foto nueva muestra otra cosa, conviene cambiarlos allí y volver a generar la página.
+
+La foto se recorta sola para llenar la postal. Para una postal nueva sin foto, `tools/pc_art.py` genera dibujos de relleno del mismo estilo que las láminas (marcador `{{PC_<CLAVE>}}` en la plantilla).
 
 ## Añadir o cambiar recetas
 
@@ -167,13 +166,13 @@ Desde el entorno de trabajo no se pudo abrir TikTok ni Instagram, así que estos
 index.html              Página generada (incluye las láminas SVG)
 tools/                  Plantilla, generadores de láminas e imagen para redes
 assets/css/styles.css   Estilos, paleta, tipografías y modo oscuro
-assets/js/config.js     Redes, fotos de las postales y temporada
+assets/js/config.js     Redes, cambios de fotos y temporada
 assets/js/recetas.js    Recetario
 assets/js/main.js       Interacción, punteado, paisaje y animaciones
 assets/fonts/           Spectral y Hanken Grotesk (WOFF2) con sus licencias
 assets/vendor/          GSAP y plugins
 assets/img/             Favicon e imagen para redes
-assets/img/fotos/       Fotos de las postales (ver config.js)
+assets/img/fotos/       Fotos de las postales
 ```
 
 La versión anterior, con el aguacate 3D, queda guardada en el historial de git (commit «Escena 3D: última versión de la apertura antes de retirarla»).
