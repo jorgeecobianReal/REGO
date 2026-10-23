@@ -1,0 +1,27 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><style>
+@font-face{font-family:'Spectral';font-weight:300;src:url(../assets/fonts/spectral-latin-300-normal.woff2) format('woff2')}
+@font-face{font-family:'Spectral';font-weight:300;font-style:italic;src:url(../assets/fonts/spectral-latin-300-italic.woff2) format('woff2')}
+@font-face{font-family:'Spectral';font-weight:400;font-style:italic;src:url(../assets/fonts/spectral-latin-400-italic.woff2) format('woff2')}
+@font-face{font-family:'Hanken Grotesk';font-weight:100 900;src:url(../assets/fonts/hanken-grotesk-latin-wght-normal.woff2) format('woff2')}
+html,body{margin:0;width:1200px;height:630px;background:#ECEEE8;color:#1A2016;overflow:hidden}
+.c{position:relative;box-sizing:border-box;width:1200px;height:630px;display:grid;grid-template-columns:1fr 330px;align-items:center;gap:40px;padding:0 96px 0 88px}
+h1{font:300 104px/.98 'Spectral',serif;letter-spacing:-.025em;margin:0}
+h1 em{font-style:italic}
+p.s{font:300 30px/1.35 'Spectral',serif;margin:30px 0 0}
+.art{width:330px;height:auto;overflow:visible;color:#1A2016}.art__fine{stroke-width:.7}.art__stipple{fill:currentColor}
+.rule{position:absolute;left:88px;right:96px;bottom:56px;border-top:1px solid rgba(26,32,22,.16);padding-top:16px;display:flex;justify-content:space-between;font:400 17px/1 'Hanken Grotesk',sans-serif;color:#576052}
+</style></head><body><div class="c">
+<div><h1>Rego <em>dos</em><br>Campos</h1><p class="s">Aguacates criados con la lluvia de Galicia.</p></div>
+<div><svg class="art art--hero" viewBox="0 0 420 520" aria-hidden="true" focusable="false" data-art><g class="art__ink" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"><path data-draw d="M418 22C356 28 296 44 240 74C202 96 160 98 112 82"/><path data-draw d="M238 76C230 102 218 130 210 160"/><path data-draw d="M300 46C297.8 93.1 347.3 138.3 402 150C381.7 104.6 338.6 53 300 46Z"/><path data-draw class="art__fine" d="M300 46C330 88 366.5 123.7 402 150"/><path data-draw d="M166 92C126.1 99.5 73.9 152 44 196C100.3 182.9 157.5 136.3 166 92Z"/><path data-draw class="art__fine" d="M166 92C127.1 132.8 84.2 169.1 44 196"/><path data-draw class="art__fine" d="M320.2 75.2Q318.8 86.7 323.9 102.2 M321.7 73.7Q332.2 73.6 345.9 80.5 M333.2 91Q331.4 103 336.7 118.2 M334.7 89.5Q346.2 88.4 361.1 94.2 M347.1 105.9Q346.1 117.1 352.3 131.4 M348.6 104.4Q360.1 103.4 375.4 108.7 M362 119.8Q362.8 129.2 370.7 142 M363.5 118.4Q373.8 118.5 388.7 124.2 M377.8 132.9Q381.4 139.6 391.3 150.3 M379.3 131.5Q387.2 133.9 400.9 140.9 M139.7 120.5Q129.6 121 114.8 128.4 M140.9 121.8Q139.9 133 131.8 148.2 M123.9 136.5Q112.9 136 97.1 142.2 M125 137.9Q124.3 149.4 115.9 164.2 M107.2 151.5Q96.1 150.9 79.8 156.5 M108.3 152.8Q106.9 163.6 97.6 177.4 M89.5 165.3Q79.3 165.7 63.1 171.5 M90.6 166.7Q87.7 175.6 77.1 187.8 M70.9 178.1Q62.4 180.6 47.2 187.4 M72 179.5Q66.9 185.8 54.6 196.1"/><path data-draw vector-effect="non-scaling-stroke" transform="translate(90 148) scale(1.2)" d="M100 10C126 10 139 38 145 74C151 109 186 136 186 190C186 241 149 272 100 272C51 272 14 241 14 190C14 136 49 109 55 74C61 38 74 10 100 10Z"/></g><g class="art__stipple" transform="translate(90 148) scale(1.2)" data-stipple="hero"></g></svg></div>
+<div class="rule"><span>Finca de aguacates en Galicia</span><span>@regodoscampos</span></div>
+</div>
+<script>
+var AVO='M100 10C126 10 139 38 145 74C151 109 186 136 186 190C186 241 149 272 100 272C51 272 14 241 14 190C14 136 49 109 55 74C61 38 74 10 100 10Z';
+function stipple(g,n,bias){var NS='http://www.w3.org/2000/svg';var p=document.createElementNS(NS,'path');p.setAttribute('d',AVO);var tmp=document.createElementNS(NS,'svg');tmp.appendChild(p);document.body.appendChild(tmp);
+var d='',seed=11;var rnd=function(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646};var k=0;
+for(var i=0;i<n*8&&k<n;i++){var x=14+rnd()*172,y=12+rnd()*258;if(!p.isPointInFill(new DOMPoint(x,y)))continue;
+var sh=Math.min(1,Math.max(0,((x-70)/116)*.55+((y-110)/162)*.65));if(rnd()>sh*sh*bias+.05)continue;var r=.38+rnd()*.52;
+d+='M'+(x-r).toFixed(1)+' '+y.toFixed(1)+'a'+r.toFixed(2)+' '+r.toFixed(2)+' 0 1 0 '+(2*r).toFixed(2)+' 0a'+r.toFixed(2)+' '+r.toFixed(2)+' 0 1 0 '+(-2*r).toFixed(2)+' 0';k++}
+tmp.remove();var q=document.createElementNS(NS,'path');q.setAttribute('d',d);g.appendChild(q)}
+document.querySelectorAll('[data-stipple]').forEach(function(g){stipple(g,620,1.15)});
+</script></body></html>

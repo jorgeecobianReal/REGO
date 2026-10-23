@@ -1,7 +1,9 @@
 /* =====================================================================
    Rego dos Campos · interacción y animación
    GSAP 3.15 (ScrollTrigger, SplitText, DrawSVG). Sin scroll suave ni
-   secciones fijadas: todo se anima una sola vez al entrar en pantalla.
+   secciones fijadas: las entradas se animan una sola vez al llegar a ellas;
+   el viento de la portada y el agua de los regos siguen en bucle mientras se
+   ven, y se pueden pausar.
    ===================================================================== */
 (function () {
   'use strict';
@@ -14,7 +16,17 @@
   var MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
   var NS = 'http://www.w3.org/2000/svg';
   var AVO = 'M100 10C126 10 139 38 145 74C151 109 186 136 186 190C186 241 149 272 100 272C51 272 14 241 14 190C14 136 49 109 55 74C61 38 74 10 100 10Z';
-  var motion = !!(window.gsap && window.ScrollTrigger && window.SplitText && window.DrawSVGPlugin && !reduce);
+  // Si el respaldo del <head> ya enseñó la página (red muy lenta), no se vuelve a esconder para animarla
+  var motion = !!(window.gsap && window.ScrollTrigger && window.SplitText && window.DrawSVGPlugin && !reduce && html.classList.contains('motion-pending'));
+
+  // Movimiento continuo en pausa: lo elige el visitante con el botón de la portada y se recuerda
+  var paused = false;
+  try { paused = localStorage.getItem('rego-quieto') === '1'; } catch (e) { /* sin almacenamiento */ }
+  var motionHooks = [];
+
+  // Safari antiguo solo conoce addListener en las consultas de medios
+  var onMedia = function (mq, fn) { if (mq.addEventListener) mq.addEventListener('change', fn); else if (mq.addListener) mq.addListener(fn); };
+  var esc = function (t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
 
   var clean = function (v) { return String(v || '').trim().replace(/^@/, ''); };
   var TIKTOK = clean(C.tiktok);
@@ -30,10 +42,6 @@
   /* ------------------------------------------------------------------
      1. Contenido que sale de config.js
      ------------------------------------------------------------------ */
-  function escapeAttr(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
   function applyConfig() {
     $$('[data-social="tiktok"]').forEach(function (a) { if (TIKTOK) a.href = 'https://www.tiktok.com/@' + TIKTOK; });
     $$('[data-social="instagram"]').forEach(function (a) { if (INSTAGRAM) a.href = 'https://www.instagram.com/' + INSTAGRAM + '/'; });
@@ -46,8 +54,8 @@
       box.innerHTML = videos.map(function (url) {
         var id = (String(url).match(/video\/(\d+)/) || [])[1];
         if (!id) return '';
-        return '<blockquote class="tiktok-embed" cite="' + escapeAttr(url) + '" data-video-id="' + id + '">' +
-          '<section><a href="' + escapeAttr(url) + '" target="_blank" rel="noopener">Ver vídeo en TikTok</a></section></blockquote>';
+        return '<blockquote class="tiktok-embed" cite="' + esc(url) + '" data-video-id="' + id + '">' +
+          '<section><a href="' + esc(url) + '" target="_blank" rel="noopener">Ver vídeo en TikTok</a></section></blockquote>';
       }).join('');
       box.hidden = false;
       var s = document.createElement('script');
@@ -75,7 +83,13 @@
   function buildCalendar() {
     var body = $('.cal__body');
     if (!body) return;
-    var data = C.temporada || {};
+    var data = C.temporada;
+    // Sin datos (config.js con un error de sintaxis, por ejemplo) se queda el texto escrito en index.html
+    if (!data || !Object.keys(data).length) {
+      if (!window.REGO_CONFIG && window.console) console.error('Rego dos Campos: no se ha podido leer assets/js/config.js (¿falta una coma o unas comillas?).');
+      $$('.cal-scroll, .cal__legend').forEach(function (el) { el.hidden = true; });
+      return;
+    }
     var now = new Date().getMonth() + 1;
     body.innerHTML = '';
     Object.keys(data).forEach(function (name) {
@@ -411,7 +425,7 @@
       raf = requestAnimationFrame(frame);
     };
     var run = function (on) {
-      on = on && onScreen && !document.hidden && !mqReduce.matches;
+      on = on && onScreen && !document.hidden && !mqReduce.matches && !paused;
       if (on === running) return;
       running = on;
       if (on) { last = performance.now(); raf = requestAnimationFrame(frame); }
@@ -422,7 +436,7 @@
     }
     document.addEventListener('visibilitychange', function () { run(true); });
     // Si se activa "reducir movimiento" con la página abierta, el aguacate vuelve a su sitio y se queda quieto
-    mqReduce.addEventListener('change', function () {
+    onMedia(mqReduce, function () {
       if (mqReduce.matches) parts.forEach(function (p) { p.a = p.v = 0; p.g.removeAttribute('transform'); });
       run(true);
     });
@@ -436,6 +450,7 @@
       lastX = e.clientX;
     });
     svg.parentNode.addEventListener('pointerleave', function () { lastX = null; });
+    motionHooks.push(function () { run(true); });
     run(true);
     return function () { start = Math.min(start, clock); };
   }
@@ -456,6 +471,13 @@
     var axis = $('.rb-axis', svg), leaves = $$('.rb-leaf', svg);
     if (reduce || !axis || !leaves.length || !axis.getTotalLength) return null;
     var len = axis.getTotalLength(), dur = 19, clock = 0, last = 0, raf = 0, running = false, started = false;
+    // Tabla de puntos del eje, calculada una vez: getPointAtLength fuerza estilo y maquetación en cada llamada
+    var LUT = [], NL = 360;
+    var at = function (d) {
+      if (!LUT.length) for (var j = 0; j <= NL; j++) { var q0 = axis.getPointAtLength(len * j / NL); LUT.push(q0.x, q0.y); }
+      var f = Math.max(0, Math.min(NL, d / len * NL)), i0 = Math.min(NL - 1, f | 0), u = f - i0;
+      return { x: LUT[2 * i0] + (LUT[2 * i0 + 2] - LUT[2 * i0]) * u, y: LUT[2 * i0 + 1] + (LUT[2 * i0 + 3] - LUT[2 * i0 + 1]) * u };
+    };
     var frame = function (now) {
       var dt = Math.min(.05, (now - last) / 1000 || 0);
       last = now;
@@ -465,7 +487,7 @@
         var t = clock * (1 - i * .18) + i * dur * .52;
         var k = (t % dur) / dur;
         var d = len * (k * .55 + k * k * .45);
-        var p = axis.getPointAtLength(d), q = axis.getPointAtLength(Math.min(len, d + 3));
+        var p = at(d), q = at(Math.min(len, d + 3));
         var ang = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI + Math.sin(t * 1.7 + i) * 10;
         leaf.setAttribute('transform', 'translate(' + p.x.toFixed(1) + ' ' + (p.y + Math.sin(t * 2.3) * .9).toFixed(1) + ') rotate(' + ang.toFixed(1) + ')');
         leaf.style.opacity = Math.max(0, Math.min(1, k * 10, (1 - k) * 10));
@@ -473,12 +495,13 @@
       raf = requestAnimationFrame(frame);
     };
     function run() {
-      var on = started && svg.classList.contains('is-live') && !document.hidden;
+      var on = started && !paused && svg.classList.contains('is-live') && !document.hidden;
       if (on === running) return;
       running = on;
       if (on) { last = performance.now(); raf = requestAnimationFrame(frame); } else cancelAnimationFrame(raf);
     }
     document.addEventListener('visibilitychange', run);
+    motionHooks.push(run);
     return function () { started = true; run(); };
   }
 
@@ -549,11 +572,15 @@
   /* ------------------------------------------------------------------
      5. Recetario: filtros, buscador y ficha en ventana
      ------------------------------------------------------------------ */
-  var RECETAS = window.REGO_RECETAS || [];
+  // Una receta mal escrita en recetas.js se salta (y se avisa en la consola) en lugar de romper el recetario
+  var RECETAS = (window.REGO_RECETAS || []).filter(function (r) {
+    var ok = r && r.title && r.cat && Array.isArray(r.ingredients) && Array.isArray(r.steps);
+    if (!ok && window.console) console.warn('Rego dos Campos: receta incompleta en recetas.js, se omite:', r && (r.id || r.title));
+    return ok;
+  });
   var CATS = ['Desayunos', 'Para picar', 'Entrantes', 'Principales', 'Postres'];
   var norm = function (t) { return String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); };
   var plain = function (h) { var d = document.createElement('div'); d.innerHTML = h; return d.textContent; };
-  var esc = function (t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
   // Solo se permite <em> en los títulos
   var title = function (h) { return esc(h).replace(/&lt;em&gt;/g, '<em>').replace(/&lt;\/em&gt;/g, '</em>'); };
   var pad = function (n) { return (n < 10 ? '0' : '') + n; };
@@ -663,13 +690,16 @@
       var b = e.target.closest('[data-go]');
       if (!b) return;
       render(Number(b.getAttribute('data-go')));
+      history.replaceState({ receta: RECETAS[state.current].id }, '', '#receta-' + RECETAS[state.current].id);
       var t = $('.recipe__title', body);
       if (t) { t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); }
       if (motion) gsap.fromTo(body, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .5, ease: 'power2.out', clearProps: 'transform,opacity' });
     });
 
-    var open = function (i, opener) {
+    // Cada receta tiene su enlace (#receta-<id>): abrirla añade un paso al historial y Atrás la cierra
+    var open = function (i, opener, fromHash) {
       render(i);
+      if (!fromHash) { history.scrollRestoration = 'manual'; history.pushState({ receta: RECETAS[i].id }, '', '#receta-' + RECETAS[i].id); }
       state.opener = opener;
       if (typeof dialog.showModal === 'function') dialog.showModal();
       else dialog.setAttribute('open', '');
@@ -678,6 +708,7 @@
     };
     var onClosed = function () {
       html.classList.remove('dialog-open');
+      if (history.state && history.state.receta) history.back();
       if (state.opener) state.opener.focus({ preventScroll: true });
     };
     var close = function () {
@@ -690,9 +721,40 @@
     });
     $('.recipe-dialog__close', dialog).addEventListener('click', close);
     dialog.addEventListener('close', onClosed);
-    dialog.addEventListener('click', function (e) { if (e.target === dialog) close(); });
+    // Se cierra al pulsar el fondo: el clic empieza y acaba fuera de la ventana (no junto a la X ni al soltar una selección)
+    var fuera = function (e) { var r = dialog.getBoundingClientRect(); return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom; };
+    var downFuera = false;
+    dialog.addEventListener('pointerdown', function (e) { downFuera = e.target === dialog && fuera(e); });
+    dialog.addEventListener('click', function (e) { if (downFuera && e.target === dialog && fuera(e)) close(); downFuera = false; });
 
     apply(false);
+
+    window.addEventListener('popstate', function () {
+      if (history.state && history.state.receta) return;
+      if (dialog.open) dialog.close();
+      window.addEventListener('hashchange', function () { history.scrollRestoration = 'auto'; }, { once: true });
+    });
+    var fromHash = function () {
+      var hm = /^#receta-(.+)$/.exec(location.hash);
+      return hm ? RECETAS.map(function (r) { return r.id; }).indexOf(decodeURIComponent(hm[1])) : -1;
+    };
+    // Un enlace a una receta con la página ya abierta (o Adelante en el historial) también la abre
+    window.addEventListener('hashchange', function () {
+      var i = fromHash();
+      if (i === -1 || dialog.open) return;
+      history.replaceState({ receta: RECETAS[i].id }, '', location.hash);
+      open(i, $('.rrow[data-i="' + i + '"] .rrow__btn'), true);
+    });
+    var idx = fromHash();
+    if (idx !== -1) {
+      if (!(history.state && history.state.receta)) {
+        history.replaceState(null, '', '#recetas');
+        history.scrollRestoration = 'manual';
+        history.pushState({ receta: RECETAS[idx].id }, '', location.pathname + location.search + '#receta-' + RECETAS[idx].id);
+      }
+      document.getElementById('recetas').scrollIntoView();
+      open(idx, $('.rrow[data-i="' + idx + '"] .rrow__btn'), true);
+    }
   }
 
   /* ------------------------------------------------------------------
@@ -725,7 +787,7 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && html.classList.contains('menu-open')) { setMenu(false); btn.focus(); }
     });
-    window.matchMedia('(min-width: 961px)').addEventListener('change', function (e) { if (e.matches) setMenu(false); });
+    onMedia(window.matchMedia('(min-width: 961px)'), function (e) { if (e.matches) setMenu(false); });
   }
 
   // Cabecera: fondo al bajar, se esconde al seguir bajando y vuelve al subir
@@ -797,6 +859,24 @@
     });
   }
 
+  // Pausar el movimiento continuo: viento, hojas y agua. Las entradas, que duran segundos, siguen
+  function initMotionToggle() {
+    var b = $('.motion-toggle');
+    if (!b || reduce) return;
+    var paint = function () {
+      html.classList.toggle('motion-paused', paused);
+      b.textContent = paused ? 'Reanudar movimiento' : 'Pausar movimiento';
+    };
+    b.hidden = false;
+    paint();
+    b.addEventListener('click', function () {
+      paused = !paused;
+      try { localStorage.setItem('rego-quieto', paused ? '1' : '0'); } catch (e) { /* sin almacenamiento */ }
+      paint();
+      motionHooks.forEach(function (fn) { fn(); });
+    });
+  }
+
   /* ------------------------------------------------------------------
      7. Animación
      ------------------------------------------------------------------ */
@@ -833,17 +913,66 @@
     gsap.from('.site-header', { opacity: 0, duration: 1, delay: .2, ease: 'power1.out', clearProps: 'opacity' });
     var art = $('.hero__art .art');
     if (art) plateTimeline(art).delay(.35).call(function () { if (windGo) windGo(); }, null, 2.2);
-    gsap.from('.hero__art .plate__cap', { autoAlpha: 0, duration: 1, delay: 2 });
+    gsap.from($$('.hero__art .plate__cap, .motion-toggle'), { autoAlpha: 0, duration: 1, delay: 2 });
   }
 
+  // Lo pendiente queda apuntado para poder completarlo todo antes de imprimir
+  var pending = [];
   function onEnter(el, fn, start) {
-    ScrollTrigger.create({ trigger: el, start: start || 'top 86%', once: true, onEnter: fn });
+    var run = function () { if (!run.done) { run.done = true; fn(); } };
+    pending.push(run);
+    ScrollTrigger.create({ trigger: el, start: start || 'top 86%', once: true, onEnter: run });
+  }
+
+  // Árboles de la finca: un solo tween reescribe la escala de cada uno, sin medir 128 cajas con getBBox.
+  // Brotan por orden de distancia al agua; cada uno crece en 0,9 s con un pequeño rebote.
+  function growTrees(land) {
+    var ease = gsap.parseEase('back.out(1.6)');
+    var trees = $$('.c-tree', land).sort(function (a, b) { return a.getAttribute('data-d') - b.getAttribute('data-d'); }).map(function (el) {
+      var m = el.getAttribute('transform').match(/translate\(([^)]*)\) scale\(([-\d.]+)\)/);
+      return { el: el, t: m[1], s: +m[2], k: -1 };
+    });
+    var n = trees.length, o = { t: 0 };
+    var paint = function () {
+      for (var i = 0; i < n; i++) {
+        var tr = trees[i], k = Math.min(1, Math.max(0, (o.t - 2.6 * i / Math.max(1, n - 1)) / .9));
+        if (k === tr.k) continue;
+        tr.k = k;
+        tr.el.setAttribute('transform', 'translate(' + tr.t + ') scale(' + (tr.s * ease(k)).toFixed(3) + ')');
+      }
+    };
+    paint();
+    return gsap.to(o, { t: 3.5, duration: 3.5, ease: 'none', onUpdate: paint });
+  }
+
+  // Lo que queda lejos se prepara al acercarse o en un rato libre: el arranque no mide todos los
+  // titulares y láminas de golpe. Si el visitante ya ha llegado (un salto con el menú), se queda como está.
+  var prepQueue = [];
+  function near(el, top, fn) {
+    if (top < window.innerHeight * 1.5) return fn();
+    var done = false, run = function () {
+      if (done) return;
+      done = true;
+      var r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight && r.bottom > 0) return;
+      fn();
+    };
+    prepQueue.push(run);
+    ScrollTrigger.create({ trigger: el, start: 'top bottom+=50%', once: true, onEnter: run });
   }
 
   function reveals() {
+    // Posiciones leídas antes de escribir nada, para no forzar la maquetación en cada elemento
+    var splits = $$('[data-split]'), splitTop = splits.map(function (el) { return el.getBoundingClientRect().top; });
+    var plates = $$('.plate .art').filter(function (svg) { return !svg.closest('.hero__art'); });
+    var plateTop = plates.map(function (svg) { return svg.getBoundingClientRect().top; });
+    var land = $('[data-contours]'), landTop = land ? land.getBoundingClientRect().top : 0;
+
     // Titulares: línea a línea, desde una máscara
-    $$('[data-split]').forEach(function (el) {
-      splitLines(el, { yPercent: 108, duration: 1.25, stagger: .08, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+    splits.forEach(function (el, i) {
+      near(el, splitTop[i], function () {
+        splitLines(el, { yPercent: 108, duration: 1.25, stagger: .08, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+      });
     });
 
     // Bloques y grupos: suben un poco y aparecen
@@ -869,10 +998,11 @@
     });
 
     // Láminas e iconos que se dibujan al llegar
-    $$('.plate .art').forEach(function (svg) {
-      if (svg.closest('.hero__art')) return;
-      var tl = plateTimeline(svg).pause();
-      onEnter(svg, function () { tl.play(); }, 'top 80%');
+    plates.forEach(function (svg, i) {
+      near(svg, plateTop[i], function () {
+        var tl = plateTimeline(svg).pause();
+        onEnter(svg, function () { tl.play(); }, 'top 80%');
+      });
     });
     $$('.step__icon').forEach(function (svg, i) {
       var tw = gsap.from(drawn(svg), { drawSVG: 0, duration: 1.4, stagger: .08, ease: 'power2.inOut', paused: true, delay: (i % 5) * .08 });
@@ -892,24 +1022,24 @@
     }
 
     // Paisaje: curvas de nivel, árboles y el rego
-    var land = $('[data-contours]');
-    if (land && land.firstChild) {
+    if (land && land.firstElementChild) near(land, landTop, function () {
       var tl = gsap.timeline({ paused: true });
       tl.from($$('.c-line', land), { drawSVG: 0, duration: 2, stagger: .07, ease: 'power2.inOut' })
-        .from($$('.c-tree', land).sort(function (a, b) { return a.getAttribute('data-d') - b.getAttribute('data-d'); }),
-          { scale: 0, transformOrigin: '50% 100%', duration: .9, stagger: { amount: 2.6 }, ease: 'back.out(1.6)' }, 1.6)
+        .add(growTrees(land), 1.6)
         .from($$('.c-source', land), { scale: 0, transformOrigin: '50% 50%', duration: .8, ease: 'power3.out' }, 1)
         .from($$('.c-ring', land), { autoAlpha: 0, duration: .6 }, 1.2)
         .from($$('.c-reveal', land), { drawSVG: 0, duration: 3.4, ease: 'power1.inOut' }, 1.2);
       onEnter(land, function () { tl.play(); }, 'top 78%');
-    }
+    });
 
     // Postales: se posan girando un poco, como al dejarlas sobre la mesa
     $$('.postcard').forEach(function (card) {
       var rot = parseFloat(getComputedStyle(card).getPropertyValue('--rot')) || 0;
+      // Sin la transición CSS de transform mientras GSAP la mueve: llegaría tarde y con doble suavizado
+      card.style.transitionProperty = 'box-shadow';
       gsap.set(card, { opacity: 0, y: 40, rotation: rot + (rot < 0 ? -7 : 7) });
       onEnter(card, function () {
-        gsap.to(card, { opacity: 1, y: 0, rotation: rot, duration: 1.4, ease: 'power3.out', clearProps: 'transform,opacity' });
+        gsap.to(card, { opacity: 1, y: 0, rotation: rot, duration: 1.4, ease: 'power3.out', clearProps: 'transform,opacity', onComplete: function () { card.style.transitionProperty = ''; } });
       }, 'top 92%');
     });
 
@@ -933,33 +1063,46 @@
       gsap.set(cells, { '--k': 0 });
       onEnter(cal, function () { gsap.to(cells, { '--k': 1, duration: .9, stagger: .05, ease: 'power2.out' }); });
     }
+
+    // El resto se prepara en ratos libres, de uno en uno, antes de que el visitante llegue
+    var idle = window.requestIdleCallback || function (cb) { return setTimeout(cb, 80); };
+    var drain = function () { var f = prepQueue.shift(); if (f) { f(); idle(drain, { timeout: 2000 }); } };
+    idle(drain, { timeout: 2000 });
   }
 
   function startMotion() {
     gsap.registerPlugin(ScrollTrigger, SplitText, DrawSVGPlugin);
     // La página está oculta (motion-pending) hasta que cada bloque tiene su estado inicial
     try { intro(); reveals(); } finally { html.classList.remove('motion-pending'); }
+    // Al imprimir, todo en su estado final: láminas dibujadas, barras del calendario y cifras
+    window.addEventListener('beforeprint', function () {
+      while (prepQueue.length) prepQueue.shift()();
+      pending.forEach(function (run) { run(); });
+      gsap.set($$('[data-reveal], [data-reveal-group] > *'), { opacity: 1, y: 0 });
+      gsap.globalTimeline.getChildren(false, true, true).forEach(function (a) { a.progress(1); });
+    });
   }
 
   /* ------------------------------------------------------------------
      Inicio
      ------------------------------------------------------------------ */
-  applyConfig();
-  buildCalendar();
-  stipple();
-  contours();
-  windGo = initWind();
-  initPostcards();
-  regoLeafGo = initRegoBand();
+  // Cada parte arranca por separado: un error en una (una receta mal escrita, un navegador antiguo) no apaga las demás
+  var safe = function (fn) { try { return fn(); } catch (e) { if (window.console) console.error(e); return null; } };
+  [applyConfig, buildCalendar, stipple, contours].forEach(safe);
+  windGo = safe(initWind);
+  safe(initPostcards);
+  regoLeafGo = safe(initRegoBand);
   if (regoLeafGo && !motion) regoLeafGo();
-  initRipeness();
-  initRecipes();
-  initMenu();
-  initHeader();
-  initFaq();
+  [initMotionToggle, initRipeness, initRecipes, initMenu, initHeader, initFaq].forEach(safe);
   if (motion) {
-    // Espera a las fuentes (máximo 0,9 s) para partir los titulares en líneas reales
-    var go = function () { if (!go.done) { go.done = true; startMotion(); } };
+    // Espera a las fuentes (máximo 0,9 s) para partir los titulares en líneas reales.
+    // Si mientras tanto el respaldo de 3 s ya enseñó la página, se queda quieta (salvo viento y agua)
+    var go = function () {
+      if (go.done) return;
+      go.done = true;
+      if (!html.classList.contains('motion-pending')) { if (windGo) windGo(); if (regoLeafGo) regoLeafGo(); return; }
+      startMotion();
+    };
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
     setTimeout(go, 900);
   } else {
